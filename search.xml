@@ -4,6 +4,156 @@
   
     
     <entry>
+      <title>Voliate关键字</title>
+      <link href="2020/10/01/Voliate%E5%85%B3%E9%94%AE%E5%AD%97/"/>
+      <url>2020/10/01/Voliate%E5%85%B3%E9%94%AE%E5%AD%97/</url>
+      
+        <content type="html"><![CDATA[<h3 id="voliate关键字"><a href="#voliate关键字" class="headerlink" title="voliate关键字"></a>voliate关键字</h3><p>####1 使变量在线程间可见<br>对于避免不可见性问题，Java还提供了一种弱形式的同步，即使用了volatile关键字。该关键字确保了对一个变量的更新对其他线程可见。当一个变量被声明为volatile时候，线程写入时候不会把值缓存在寄存器或者或者在其他地方，当线程读取的时候会从主内存重新获取最新值，而不是使用当前线程的拷贝内存变量值。volatile虽然提供了可见性保证，但是不能使用他来构建复合的原子性操作，也就是说当一个变量依赖其他变量或者更新变量值时候新值依赖当前老值时候不在适用。与synchronized相似之处在于如图</p><p><img src="https://upload-images.jianshu.io/upload_images/1463524-341008d65746e274.png?imageMogr2/auto-orient/strip%7CimageView2/2/format/webp" alt="avatar"></p><p>如图线程A修改了volatile变量b的值，然后线程B读取了改变量值，那么所有A线程在写入变量b值前可见的变量值，在B读取volatile变量b后对线程B都是可见的，图中线程B对A操作的变量a,b的值都可见的。volatile的内存语义和synchronized有类似之处，具体说是说当线程写入了volatile变量值就等价于线程退出synchronized同步块（会把写入到本地内存的变量值同步到主内存），读取volatile变量值就相当于进入同步块（会先清空本地内存变量值，从主内存获取最新值）。</p><pre><code>```java public class Test extends Thread&#123; //voliateprivate String i =&quot;sss&quot;;private void setI(String i)&#123;    this.i=i;&#125;@Overridepublic void run() &#123;    System.out.println(&quot;进入方法&quot;+i);    while (i.equals(&quot;sss&quot;))&#123;    &#125;    System.out.println(&quot;线程结束&quot;);&#125;public static void main(String[] args ) throws InterruptedException&#123;    Test test=new Test();    test.start();    Thread.sleep(1000);    System.out.println(&quot;线程设置了stop&quot;);    test.setI(&quot;线程设置了stop&quot;); &#125;&#125;```</code></pre><p>上面是一个简单的示例。</p><ol><li>首先运行代码,可以看到,尽管将变量设置了stop,test线程并没有如预期的停止.说明,test线程内的i的并没有被修改,test只是在start时将i变量拷贝到了线程自有的一块空间内,与主线内的i变量互不影响.</li></ol><p>2.将voliate关键字放在变量i的声明上,运行发现程序正常停止.可见变量i在任何一个线程内都是可见的,当变量i在主线程被修改时,子线程立即获得了被更新的值.</p><ol start="3"><li>最坑的地方来了,打开代码中的while循环中的打印语句,将voliate关键字注释掉,执行代码.神奇的事情发生了,程序正常的停止了,WTF!(在我最开始研究voliate的时候,我一直有这句输出语句,一直得不到正确结果)这是为啥呢？下面这段话基本说明了问题,同时你也可以将输出语句注释点,打开sleep的注释,看看结果.</li></ol><p>JVM会尽力保证内存的可见性，即便这个变量没有加同步关键字。换句话说，只要CPU有时间，JVM会尽力去保证变量值的更新。这种与volatile关键字的不同在于，volatile关键字会强制的保证线程的可见性。而不加这个关键字，JVM也会尽力去保证可见性，但是如果CPU一直有其他的事情在处理，它也没办法。最开始的代码，一直处于试了循环中，CPU处于一直被饱受占用的时候，这个时候CPU没有时间，JVM也不能强制要求CPU分点时间去取最新的变量值。而加了System.out.println之后，由于内部代码的同步关键字的存在，导致CPU的输出其实是比较耗时的。这个时候CPU就有可能有时间去保证内存的可见性，于是while循环可以被终止。其实，也可以在while循环里面加上sleep，让run方法放弃cpu，但是不放弃锁，这个时候由于CPU有空闲的时候就去按照JVM的要求去保证内存的可见性。如下图所示。 run方法里面休息了3秒，cpu有充足的空闲时间去取变量的最新值，所以循环执行一次就停止了。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 并发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 并发 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>什么是AQS及其原理</title>
+      <link href="2020/09/12/AQS%E5%8F%8A%E5%85%B6%E5%8E%9F%E7%90%86/"/>
+      <url>2020/09/12/AQS%E5%8F%8A%E5%85%B6%E5%8E%9F%E7%90%86/</url>
+      
+        <content type="html"><![CDATA[<h3 id="1、AQS简介"><a href="#1、AQS简介" class="headerlink" title="1、AQS简介"></a>1、AQS简介</h3><p>AQS全名：AbstractQueuedSynchronizer，是并发容器J.U.C（java.lang.concurrent）下locks包内的一个类。它实现了一个FIFO(FirstIn、FisrtOut先进先出)的队列。底层实现的数据结构是一个双向链表。</p><p><img src="https://www.pianshen.com/images/796/7cc7646e4fd1cb94f1cbf6e895725b94.png" alt="avatar"></p><p>Sync queue：同步队列，是一个双向链表。包括head节点和tail节点。head节点主要用作后续的调度。 Condition queue：非必须，单向链表。当程序中存在cindition的时候才会存在此列表。</p><p><strong>AQS核心思想是，如果被请求的共享资源空闲，则将当前请求资源的线程设置为有效的工作线程，并且将共享资源设置为锁定状态。如果被请求的共享资源被占用，那么就需要一套线程阻塞等待以及被唤醒时锁分配的机制，这个机制AQS是用CLH队列锁实现的，即将暂时获取不到锁的线程加入到队列中。</strong></p><p><strong>AQS使用一个int成员变量来表示同步状态</strong>，通过内置的FIFO队列来完成获取资源线程的排队工作。AQS使用CAS对该同步状态进行原子操作实现对其值的修改。</p><p>状态信息通过procted类型的getState，setState，compareAndSetState进行操作</p><pre><code>```//返回同步状态的当前值 protected final int getState() &#123;       return state; &#125; // 设置同步状态的值 protected final void setState(int newState) &#123;      state = newState;&#125;//原子地（CAS操作）将同步状态值设置为给定值update如果当前同步状态的值等于expect（期望值）protected final boolean compareAndSetState(int expect, int update) &#123;   return unsafe.compareAndSwapInt(this, stateOffset, expect, update);&#125;```</code></pre><h3 id="2、AQS设计思想"><a href="#2、AQS设计思想" class="headerlink" title="2、AQS设计思想"></a>2、AQS设计思想</h3><ul><li>使用Node实现FIFO队列，可以用于构建锁或者其他同步装置的基础框架。</li><li>利用int类型标识状态。<strong>在AQS类中有一个叫做state的成员变量</strong></li></ul><p>基于AQS有一个同步组件，叫做ReentrantLock。<strong>在这个组件里，stste表示获取锁的线程数，假如state=0，表示还没有线程获取锁，1表示有线程获取了锁。大于1表示重入锁的数量。</strong></p><p>继承：子类通过继承并通过实现它的方法管理其状态（acquire和release方法操纵状态）。</p><p>可以同时实现排它锁和共享锁模式（独占、共享），站在一个使用者的角度，AQS的功能主要分为两类：<strong>独占和共享</strong>。它的所有子类中，要么实现并使用了它的独占功能的api，要么使用了共享锁的功能，而不会同时使用两套api，即便是最有名的子类ReentrantReadWriteLock也是通过两个内部类读锁和写锁分别实现了两套api来实现的。</p><h3 id="3、AQS的大致实现思路"><a href="#3、AQS的大致实现思路" class="headerlink" title="3、AQS的大致实现思路"></a>3、AQS的大致实现思路</h3><p>AQS内部维护了一个CLH队列来管理锁。<strong>线程会首先尝试获取锁，如果失败就将当前线程及等待状态等信息包装成一个node节点加入到同步队列sync queue里</strong>。 接着会不断的循环尝试获取锁，条件是当前节点为head的直接后继才会尝试。如果失败就会阻塞自己直到自己被唤醒。而当持有锁的线程释放锁的时候，会唤醒队列中的后继线程。</p><p>CLH(Craig,Landin,and Hagersten)队列是一个虚拟的双向队列（虚拟的双向队列即不存在队列实例，仅存在结点之间的关联关系）。AQS是将每条请求共享资源的线程封装成一个CLH锁队列的一个结点（Node）来实现锁的分配。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 并发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 并发 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Java中CAS详解</title>
+      <link href="2020/09/01/Java%E4%B8%ADCAS%E8%AF%A6%E8%A7%A3/"/>
+      <url>2020/09/01/Java%E4%B8%ADCAS%E8%AF%A6%E8%A7%A3/</url>
+      
+        <content type="html"><![CDATA[<p>在JDK 5之前Java语言是靠synchronized关键字保证同步的，这会导致有锁</p><p>锁机制存在以下问题：</p><p>（1）在多线程竞争下，加锁、释放锁会导致比较多的上下文切换和调度延时，引起性能问题。</p><p>（2）一个线程持有锁会导致其它所有需要此锁的线程挂起。</p><p>（3）如果一个优先级高的线程等待一个优先级低的线程释放锁会导致优先级倒置，引起性能风险。</p><p>volatile是不错的机制，但是volatile不能保证原子性。因此对于同步最终还是要回到锁机制上来。</p><p><strong>独占锁是一种悲观锁，synchronized就是一种独占锁，会导致其它所有需要锁的线程挂起，等待持有锁的线程释放锁。而另一个更加有效的锁就是乐观锁。所谓乐观锁就是，每次不加锁而是假设没有冲突而去完成某项操作，如果因为冲突失败就重试，直到成功为止。乐观锁用到的机制就是CAS，Compare and Swap。</strong></p><h3 id="一、什么是CAS"><a href="#一、什么是CAS" class="headerlink" title="一、什么是CAS"></a>一、什么是CAS</h3><p>CAS,compare and swap的缩写，中文翻译成比较并交换。</p><p>我们都知道，在java语言之前，并发就已经广泛存在并在服务器领域得到了大量的应用。所以硬件厂商老早就在芯片中加入了大量直至并发操作的原语，从而在硬件层面提升效率。在intel的CPU中，使用cmpxchg指令。</p><p>在Java发展初期，java语言是不能够利用硬件提供的这些便利来提升系统的性能的。而随着java不断的发展,Java本地方法(JNI)的出现，使得java程序越过JVM直接调用本地方法提供了一种便捷的方式，因而java在并发的手段上也多了起来。而在Doug Lea提供的cucurenct包中，CAS理论是它实现整个java包的基石。</p><p>CAS 操作包含三个操作数 —— 内存位置（V）、预期原值（A）和新值(B)。 如果内存位置的值与预期原值相匹配，那么处理器会自动将该位置值更新为新值 。否则，处理器不做任何操作。无论哪种情况，它都会在 CAS 指令之前返回该 位置的值。（在 CAS 的一些特殊情况下将仅返回 CAS 是否成功，而不提取当前 值。）CAS 有效地说明了“我认为位置 V 应该包含值 A；如果包含该值，则将 B 放到这个位置；否则，不要更改该位置，只告诉我这个位置现在的值即可。”</p><p>通常将 CAS 用于同步的方式是从地址 V 读取值 A，执行多步计算来获得新 值 B，然后使用 CAS 将 V 的值从 A 改为 B。如果 V 处的值尚未同时更改，则 CAS 操作成功。</p><p>类似于 CAS 的指令允许算法执行读-修改-写操作，而无需害怕其他线程同时 修改变量，因为如果其他线程修改变量，那么 CAS 会检测它（并失败），算法 可以对该操作重新计算。</p><h3 id="二、CAS的目的"><a href="#二、CAS的目的" class="headerlink" title="二、CAS的目的"></a>二、CAS的目的</h3><p>利用CPU的CAS指令，同时借助JNI来完成Java的非阻塞算法。其它原子操作都是利用类似的特性完成的。而整个J.U.C都是建立在CAS之上的，因此对于synchronized阻塞算法，J.U.C在性能上有了很大的提升。</p><p>三、CAS存在的问题</p><p>CAS虽然很高效的解决原子操作，但是CAS仍然存在三大问题。ABA问题，循环时间长开销大和只能保证一个共享变量的原子操作</p><p><strong>1.  ABA问题</strong>。因为CAS需要在操作值的时候检查下值有没有发生变化，如果没有发生变化则更新，但是如果一个值原来是A，变成了B，又变成了A，那么使用CAS进行检查时会发现它的值没有发生变化，但是实际上却变化了。ABA问题的解决思路就是使用版本号。在变量前面追加上版本号，每次变量更新的时候把版本号加一，那么A－B－A 就会变成1A-2B－3A。</p><p>从Java1.5开始JDK的atomic包里提供了一个类AtomicStampedReference来解决ABA问题。这个类的compareAndSet方法作用是首先检查当前引用是否等于预期引用，并且当前标志是否等于预期标志，如果全部相等，则以原子方式将该引用和该标志的值设置为给定的更新值。</p><p>**<br>2. 循环时间长开销大**。自旋CAS如果长时间不成功，会给CPU带来非常大的执行开销。如果JVM能支持处理器提供的pause指令那么效率会有一定的提升，pause指令有两个作用，第一它可以延迟流水线执行指令（de-pipeline）,使CPU不会消耗过多的执行资源，延迟的时间取决于具体实现的版本，在一些处理器上延迟时间是零。第二它可以避免在退出循环的时候因内存顺序冲突（memory order violation）而引起CPU流水线被清空（CPU pipeline flush），从而提高CPU的执行效率。</p><p><strong>3. 只能保证一个共享变量的原子操作</strong>。当对一个共享变量执行操作时，我们可以使用循环CAS的方式来保证原子操作，但是对多个共享变量操作时，循环CAS就无法保证操作的原子性，这个时候就可以用锁，或者有一个取巧的办法，就是把多个共享变量合并成一个共享变量来操作。比如有两个共享变量i＝2,j=a，合并一下ij=2a，然后用CAS来操作ij。从Java1.5开始JDK提供了AtomicReference类来保证引用对象之间的原子性，你可以把多个变量放在一个对象里来进行CAS操作。</p><h3 id="四、concurrent包的实现"><a href="#四、concurrent包的实现" class="headerlink" title="四、concurrent包的实现"></a>四、concurrent包的实现</h3><p>由于java的CAS同时具有 volatile 读和volatile写的内存语义，因此Java线程之间的通信现在有了下面四种方式：</p><p>A线程写volatile变量，随后B线程读这个volatile变量。<br>A线程写volatile变量，随后B线程用CAS更新这个volatile变量。<br>A线程用CAS更新一个volatile变量，随后B线程用CAS更新这个volatile变量。<br>A线程用CAS更新一个volatile变量，随后B线程读这个volatile变量。<br>Java的CAS会使用现代处理器上提供的高效机器级别原子指令，这些原子指令以原子方式对内存执行读-改-写操作，这是在多处理器中实现同步的关键（从本质上来说，能够支持原子性读-改-写指令的计算机器，是顺序计算图灵机的异步等价机器，因此任何现代的多处理器都会去支持某种能对内存执行原子性读-改-写操作的原子指令）。同时，volatile变量的读/写和CAS可以实现线程之间的通信。把这些特性整合在一起，就形成了整个concurrent包得以实现的基石。如果我们仔细分析concurrent包的源代码实现，会发现一个通用化的实现模式：</p><p>首先，声明共享变量为volatile；<br>然后，使用CAS的原子条件更新来实现线程之间的同步；<br>同时，配合以volatile的读/写和CAS所具有的volatile读和写的内存语义来实现线程之间的通信。<br>AQS，非阻塞数据结构和原子变量类（java.util.concurrent.atomic包中的类），这些concurrent包中的基础类都是使用这种模式来实现的，而concurrent包中的高层类又是依赖于这些基础类来实现的。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 并发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 并发 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Java线程池详解</title>
+      <link href="2020/08/20/Java%E7%BA%BF%E7%A8%8B%E6%B1%A0%E8%AF%A6%E8%A7%A3/"/>
+      <url>2020/08/20/Java%E7%BA%BF%E7%A8%8B%E6%B1%A0%E8%AF%A6%E8%A7%A3/</url>
+      
+        <content type="html"><![CDATA[<p>###1、线程池的优势</p><p>（1）、降低系统资源消耗，通过重用已存在的线程，降低线程创建和销毁造成的消耗；<br>（2）、提高系统响应速度，当有任务到达时，通过复用已存在的线程，无需等待新线程的创建便能立即执行；<br>（3）方便线程并发数的管控。因为线程若是无限制的创建，可能会导致内存占用过多而产生OOM，并且会造成cpu过度切换（cpu切换线程是有时间成本的（需要保持当前执行线程的现场，并恢复要执行线程的现场））。<br>（4）提供更强大的功能，延时定时线程池。</p><h3 id="2、线程池的主要参数"><a href="#2、线程池的主要参数" class="headerlink" title="2、线程池的主要参数"></a>2、线程池的主要参数</h3><pre><code>``` public ThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue&lt;Runnable&gt; workQueue) &#123;this(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue,     Executors.defaultThreadFactory(), defaultHandler);&#125;```</code></pre><p>1、corePoolSize（线程池基本大小）：当向线程池提交一个任务时，若线程池已创建的线程数小于corePoolSize，即便此时存在空闲线程，也会通过创建一个新线程来执行该任务，直到已创建的线程数大于或等于corePoolSize时，（除了利用提交新任务来创建和启动线程（按需构造），也可以通过 prestartCoreThread() 或 prestartAllCoreThreads() 方法来提前启动线程池中的基本线程。）</p><p>2、maximumPoolSize（线程池最大大小）：线程池所允许的最大线程个数。当队列满了，且已创建的线程数小于maximumPoolSize，则线程池会创建新的线程来执行任务。另外，对于无界队列，可忽略该参数。</p><p>3、keepAliveTime（线程存活保持时间）当线程池中线程数大于核心线程数时，线程的空闲时间如果超过线程存活时间，那么这个线程就会被销毁，直到线程池中的线程数小于等于核心线程数。</p><p>4、workQueue（任务队列）：用于传输和保存等待执行任务的阻塞队列。</p><p>5、threadFactory（线程工厂）：用于创建新线程。threadFactory创建的线程也是采用new Thread()方式，threadFactory创建的线程名都具有统一的风格：pool-m-thread-n（m为线程池的编号，n为线程池内的线程编号）。</p><p>5、handler（线程饱和策略）：当线程池和队列都满了，再加入线程会执行此策略。</p><h3 id="3、线程池流程"><a href="#3、线程池流程" class="headerlink" title="3、线程池流程"></a>3、线程池流程</h3><p><img src="https://upload-images.jianshu.io/upload_images/6024478-88ee7b20f8f45825.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/937/format/webp" alt="avatar"></p><p>1、判断核心线程池是否已满，没满则创建一个新的工作线程来执行任务。已满则。<br>2、判断任务队列是否已满，没满则将新提交的任务添加在工作队列，已满则。<br>3、判断整个线程池是否已满，没满则创建一个新的工作线程来执行任务，已满则执行饱和策略。</p><p>（1、判断线程池中当前线程数是否大于核心线程数，如果小于，在创建一个新的线程来执行任务，如果大于则<br>2、判断任务队列是否已满，没满则将新提交的任务添加在工作队列，已满则。<br>3、判断线程池中当前线程数是否大于最大线程数，如果小于，则创建一个新的线程来执行任务，如果大于，则执行饱和策略。）</p><h3 id="4、线程池为什么需要使用（阻塞）队列？"><a href="#4、线程池为什么需要使用（阻塞）队列？" class="headerlink" title="4、线程池为什么需要使用（阻塞）队列？"></a>4、线程池为什么需要使用（阻塞）队列？</h3><p>回到了非线程池缺点中的第3点：<br>1、因为线程若是无限制的创建，可能会导致内存占用过多而产生OOM，并且会造成cpu过度切换。</p><p>另外回到了非线程池缺点中的第1点：<br>2、创建线程池的消耗较高。<br>或者下面这个网上并不高明的回答：<br>2、线程池创建线程需要获取mainlock这个全局锁，影响并发效率，阻塞队列可以很好的缓冲。</p><h3 id="5、线程池为什么要使用阻塞队列而不使用非阻塞队列？"><a href="#5、线程池为什么要使用阻塞队列而不使用非阻塞队列？" class="headerlink" title="5、线程池为什么要使用阻塞队列而不使用非阻塞队列？"></a>5、线程池为什么要使用阻塞队列而不使用非阻塞队列？</h3><p>阻塞队列可以保证任务队列中没有任务时阻塞获取任务的线程，使得线程进入wait状态，释放cpu资源。<br>当队列中有任务时才唤醒对应线程从队列中取出消息进行执行。<br>使得在线程不至于一直占用cpu资源。</p><p>（线程执行完任务后通过循环再次从任务队列中取出任务进行执行，代码片段如下<br>while (task != null || (task = getTask()) != null) {}）。</p><p>不用阻塞队列也是可以的，不过实现起来比较麻烦而已，有好用的为啥不用呢？</p><h3 id="6-如何配置线程池"><a href="#6-如何配置线程池" class="headerlink" title="6.如何配置线程池"></a>6.如何配置线程池</h3><p>CPU密集型任务<br>尽量使用较小的线程池，一般为CPU核心数+1。 因为CPU密集型任务使得CPU使用率很高，若开过多的线程数，会造成CPU过度切换。</p><p>IO密集型任务<br>可以使用稍大的线程池，一般为2*CPU核心数。 IO密集型任务CPU使用率并不高，因此可以让CPU在等待IO的时候有其他线程去处理别的任务，充分利用CPU时间。</p><p>混合型任务<br>可以将任务分成IO密集型和CPU密集型任务，然后分别用不同的线程池去处理。 只要分完之后两个任务的执行时间相差不大，那么就会比串行执行来的高效。<br>因为如果划分之后两个任务执行时间有数据级的差距，那么拆分没有意义。<br>因为先执行完的任务就要等后执行完的任务，最终的时间仍然取决于后执行完的任务，而且还要加上任务拆分与合并的开销，得不偿失。</p><h3 id="7、java中提供的线程池"><a href="#7、java中提供的线程池" class="headerlink" title="7、java中提供的线程池"></a>7、java中提供的线程池</h3><p>Executors类提供了4种不同的线程池：newCachedThreadPool, newFixedThreadPool, newScheduledThreadPool, newSingleThreadExecutor</p><p>1、newCachedThreadPool：用来创建一个可以无限扩大的线程池，适用于负载较轻的场景，执行短期异步任务。（可以使得任务快速得到执行，因为任务时间执行短，可以很快结束，也不会造成cpu过度切换）</p><p>2、newFixedThreadPool：创建一个固定大小的线程池，因为采用无界的阻塞队列，所以实际线程数量永远不会变化，适用于负载较重的场景，对当前线程数量进行限制。（保证线程数可控，不会造成线程过多，导致系统负载更为严重）</p><p>3、newSingleThreadExecutor：创建一个单线程的线程池，适用于需要保证顺序执行各个任务。</p><p>4、newScheduledThreadPool：适用于执行延时或者周期性任务。</p><h3 id="8、execute-和submit-方法"><a href="#8、execute-和submit-方法" class="headerlink" title="8、execute()和submit()方法"></a>8、execute()和submit()方法</h3><p>1、execute()，执行一个任务，没有返回值。<br>2、submit()，提交一个线程任务，有返回值。<br>submit(Callable<T> task)能获取到它的返回值，通过future.get()获取（阻塞直到任务执行完）。一般使用FutureTask+Callable配合使用（IntentService中有体现）。</p><p>submit(Runnable task, T result)能通过传入的载体result间接获得线程的返回值。<br>submit(Runnable task)则是没有返回值的，就算获取它的返回值也是null。</p><p>Future.get方法会使取结果的线程进入阻塞状态，知道线程执行完成之后，唤醒取结果的线程，然后返回结果。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 并发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 并发 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>并发编程的挑战</title>
+      <link href="2020/08/15/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E6%8C%91%E6%88%98/"/>
+      <url>2020/08/15/%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E6%8C%91%E6%88%98/</url>
+      
+        <content type="html"><![CDATA[<p>1、上下文切换的问题</p><p>2、死锁的问题、</p><p>3、受限于硬件和软件的资源问题</p><p>一、上下文切换问题</p><p>单核处理器也支持多线程执行代码，cpu通过给每个线程分配cpu时间片来实现这个机制，时间片非常短，需要不停的切换线程执行，让我们感觉多线程是同时执行的，时间片一般是几十毫秒</p><p>查看上下文切换状态：</p><blockquote><p>**grep java.lang.Thread.State dump305 | awk ‘{print $2$3$4$5}’ | sort | uniq -c  **</p></blockquote><p>任务从保存到再加载的过程就是一次上下文切换，上下文切换会影响多线程的执行速度</p><p>如何减少上下文切换？</p><p>1、无锁并发编程</p><p>可以用一些方法来避免使用锁，如将数据的ID按照哈希算法取模分段，不同的线程处理不同段的数据</p><p>2、CAS算法</p><p>3、使用最少线程和使用协程</p><p>在单线程里实现多任务的调度，并在单线程里维持多个任务间的切换</p><p>避免死锁的几个常见方法</p><p>1、避免一个线程同时获取多个锁</p><p>2、避免一个线程在锁内同时占用多个资源，尽量保证每个锁只占用一个资源</p><p>3、尝试使用定时锁，使用lock.tryLcok(timeout)来替代使用内部锁机制</p><p>4、对于数据库锁，加锁和解锁必须在一个数据库连接里，否则会出现解锁失败的情况</p><p>资源限制</p><p>硬件资源限制：带宽的上传下载速度、硬盘的读写速度、CPU的处理速度、</p><p>解决方案：可以使用集群并行执行程序</p><p>软件资源限制：数据库的连接数、socket的连接数</p><p>解决方案：可以使用资源池将资源复用，如数据库的连接池和Socket复用，或者在调用对方的webservice接口的时候，只建立一个连接</p><p>在资源限制的情况下进行并发编程</p><p>根据不同的资源，限制调整程序的并发度，如下载文件程序依赖于带宽和磁盘读写速度，有数据库操作时候，涉及到数据库的连接数，如果sql执行非常快，而线程的数量比数据库连接数大很多，则某些线程会被阻塞，等待数据库的连接。</p><p>CPU飙升到100%，有可能是不恰当的并发程序引起的</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 并发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 并发 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Java并发机制的底层实现原理</title>
+      <link href="2020/08/01/Java%E5%B9%B6%E5%8F%91%E6%9C%BA%E5%88%B6%E7%9A%84%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/"/>
+      <url>2020/08/01/Java%E5%B9%B6%E5%8F%91%E6%9C%BA%E5%88%B6%E7%9A%84%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/</url>
+      
+        <content type="html"><![CDATA[<p>java中所使用的并发机制依赖于jvm的实现和cpu的指令</p><p>volatile</p><p>volatile是轻量级的synchronized，如果这个修饰符使用恰当的话，它比synchronized的使用和执行成本更低，因为他不会引起线程上下文的切换和调度</p><p>定义：java允许线程访问共享变量，为了确保共享变量能被准确和一致性的更新，线程应该确保通过排他锁单独获得这个变量，如果一个字段被设置成volatile，java线程内存模型确保所以线程看到的这个变量的值是一致的</p><p>lock前缀的指令在多核处理器下会做两件事：</p><p>1）将当前处理器缓存行的数据写回到系统内存</p><p>2）这个写回内存的操作会使在其他cpu里面缓存了该内存地址的数据无效</p><p>当使用volatile修饰的变量进行写操作的时候，jvm就会向处理器发送一条lock前缀的指令，通过缓存一致性协议，每个处理器嗅探在总线上传播的数据来检查自己缓存的值是不是过期了，当处理器发现自己缓存行对应的内存地址被修改，就会将当前处理器的缓存行设置成无效状态，当处理器对这个数据进行修改操作的时候，会重新从系统内存中把数据读取到缓存里</p><p>volatile的两条实现规则</p><p>（1）lock前缀指令会引起处理器缓存回写到内存</p><p>（2）一个处理器的缓存回写到内存会导致其他的处理器的缓存无效</p><p>volatile的优化</p><p>LinkedTransferQueue通过追加成64字节的方式提高效率，因为很多处理器的高速缓存行都是64字节，如果不追加空的字节会把头节点和尾节点放到一个缓存行，导致修改的时候缓存锁定，入队和出队不能同时操作而相互锁定</p><p>以下两种场景不应该把volatile变量追加到64字节</p><p>1）缓存行非64字节的处理器</p><p>2）共享变量不会被频繁的写</p><p>这种追加字节的方式在java7中不可能生效，因为会淘汰或者重新排序无用的字段，需要使用其他追加字节的方式</p><p>synchronized</p><p>对于普通的同步方法 锁的是当前实例的对象</p><p>对于静态的同步方法锁的是当前类的class对象</p><p>对于同步代码块 锁的是括号里的对象</p><p>jvm基于进入和退出Monitor对象来实现方法同步和代码块同步</p><p>synchronized用的锁是存在于java对象头里面的，如果对象是数组类型，则虚拟机用三个字宽存储对象头，如果对象是非数组类型，则使用2个字宽存储对象头，在32位的虚拟机中，一字宽是32bit，即4字节</p><p><img src="https://img-blog.csdnimg.cn/20191029180701482.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3lhbjg4ODg4ODg4ODg4ODg4ODg4,size_16,color_FFFFFF,t_70" alt="avatar"></p><p>Mark Word 默认存储对象的hashcode，分代年龄和锁标记位，32位的jvm的 Mark Word 默认存储如下所示</p><p><img src="https://img-blog.csdnimg.cn/20191029180914348.png" alt="avatar"></p><p>Mark Word里面的数据会随着运行而变化，可能有以下四种情况<br><img src="https://img-blog.csdnimg.cn/2019102918132359.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3lhbjg4ODg4ODg4ODg4ODg4ODg4,size_16,color_FFFFFF,t_70" alt="avatar"></p><p> 64位的存储结构</p><p><img src="https://img-blog.csdnimg.cn/20191029183211209.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3lhbjg4ODg4ODg4ODg4ODg4ODg4,size_16,color_FFFFFF,t_70" alt="avatar"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 并发 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 并发 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>JVM内存划分</title>
       <link href="2020/07/12/JVM%E5%86%85%E5%AD%98%E5%88%92%E5%88%86/"/>
       <url>2020/07/12/JVM%E5%86%85%E5%AD%98%E5%88%92%E5%88%86/</url>
