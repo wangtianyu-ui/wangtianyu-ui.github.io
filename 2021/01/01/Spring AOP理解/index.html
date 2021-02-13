@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="MySQL索引, 王添俞的博客">
+    <meta name="keywords" content="Spring AOP理解, 王添俞的博客">
     <meta name="description" content="">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>MySQL索引 | 王添俞的博客</title>
+    <title>Spring AOP理解 | 王添俞的博客</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -310,12 +310,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/3.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/4.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">MySQL索引</h1>
+                    <h1 class="description center-align post-title">Spring AOP理解</h1>
                 </div>
             </div>
         </div>
@@ -431,8 +431,8 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/Mysql/">
-                                <span class="chip bg-color">Mysql</span>
+                            <a href="/tags/Spring/">
+                                <span class="chip bg-color">Spring</span>
                             </a>
                         
                     </div>
@@ -443,8 +443,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Mysql/" class="post-category">
-                                Mysql
+                            <a href="/categories/Spring/" class="post-category">
+                                Spring
                             </a>
                         
                     </div>
@@ -456,7 +456,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2020-12-10
+                    2021-01-01
                 </div>
                 
 
@@ -477,212 +477,48 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="MySQL-索引"><a href="#MySQL-索引" class="headerlink" title="MySQL 索引"></a>MySQL 索引</h3><p>数据库索引的原理：数据库索引，是数据库管理系统中一个排序的数据结构，以协助快速查询、更新数据库表中数据。索引的实现通常使用 BTree 及其变种 B+Tree。</p>
-<p>本文从如何建立 MySQL 索引以及介绍 MySQL 的索引类型，再讲 MySQL 索引的利与弊，以及建立索引时需要注意的地方。</p>
-<p>首先:先假设有一张表,表的数据有 10W 条数据,其中有一条数据是 nickname=’css’ ,如果要拿这条数据的话需要些的 sql 是</p>
-<pre><code> SELECT * FROM award WHERE nickname = &#39;css&#39;;
-</code></pre>
-<p>一般情况下,在没有建立索引的时候, mysql 需要扫描全表及扫描 10W 条数据找这条数据,如果我在 nickname 上建立索引,那么mysql只需要扫描一行数据及为我们找到这条 nickname=’css’ 的数据,是不是感觉性能提升了好多咧….</p>
-<p>mysql 的索引分为 单例索引（主键索引、唯一索引、普通索引）和 组合索引。</p>
-<ul>
-<li><p>单例索引：一个索引只包含一个列，一个表可以有多个单例索引。</p>
+                <p>这种在运行时，动态地将代码切入到类的指定方法、指定位置上的编程思想就是面向切面的编程。 </p>
+<h4 id="1-我所知道的aop"><a href="#1-我所知道的aop" class="headerlink" title="1.我所知道的aop"></a>1.我所知道的aop</h4><p>　　初看aop,上来就是一大堆术语，而且还有个拉风的名字，面向切面编程，都说是OOP的一种有益补充等等。一下子让你不知所措，心想着：怪不得很多人都和我说aop多难多难。当我看进去以后，我才发现：它就是一些java基础上的朴实无华的应用，包括ioc，包括许许多多这样的名词，都是万变不离其宗而已。</p>
+<h4 id="2-为什么用aop"><a href="#2-为什么用aop" class="headerlink" title="2.为什么用aop"></a>2.为什么用aop</h4><ol>
+<li><p>就是为了方便，看一个国外很有名的大师说，编程的人都是“懒人”，因为他把自己做的事情都让程序做了。用了aop能让你少写很多代码，这点就够充分了吧</p>
 </li>
-<li><p>组合索引：一个组合索引包含两个或两个以上的列。<br>本文使用的案例的表：</p>
-<pre><code> CREATE TABLE `award` (
-   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT &#39;用户id&#39;,
-   `aty_id` varchar(100) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;活动场景id&#39;,
-   `nickname` varchar(12) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;用户昵称&#39;,
-   `is_awarded` tinyint(1) NOT NULL DEFAULT 0 COMMENT &#39;用户是否领奖&#39;,
-   `award_time` int(11) NOT NULL DEFAULT 0 COMMENT &#39;领奖时间&#39;,
-   `account` varchar(12) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;帐号&#39;,
-   `password` char(32) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;密码&#39;,
-   `message` varchar(255) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;获奖信息&#39;,
-   `created_time` int(11) NOT NULL DEFAULT 0 COMMENT &#39;创建时间&#39;,
-   `updated_time` int(11) NOT NULL DEFAULT 0 COMMENT &#39;更新时间&#39;,
-   PRIMARY KEY (`id`)
- ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT=&#39;获奖信息表&#39;;
- 
-INSERT INTO `award` (`nickname`, `account`, `message`, `created_time`)
-VALUES (&#39;rSUQFzpkDz3R&#39;, &#39;DYxJoqZq2rd7&#39;, &#39;aaabbbccccxuxuxuxuuxux&#39;, 1449567822);```
-</code></pre>
+<li><p>就是为了更清晰的逻辑，可以让你的业务逻辑去关注自己本身的业务，而不去想一些其他的事情，这些其他的事情包括：安全，事物，日志等。</p>
 </li>
-</ul>
-<h4 id="一-索引的创建"><a href="#一-索引的创建" class="headerlink" title="(一) 索引的创建"></a>(一) 索引的创建</h4><ol>
-<li>单例索引</li>
 </ol>
-<p>1.1）普通索引，这个是最基本的索引。</p>
-<p>其 sql 格式是 :</p>
-<pre><code> CREATE INDEX IndexName ON `TableName`(`字段名`(length));
-# 或者
-ALTER TABLE TableName ADD INDEX IndexName(`字段名`(length));
-</code></pre>
-<p>第一种方式：</p>
-<pre><code>CREATE INDEX account_Index ON `award`(`account`);
-</code></pre>
-<p>第二种方式：</p>
-<pre><code>ALTER TABLE award ADD INDEX account_Index(`account`);
-</code></pre>
-<p>如果是 CHAR , VARCHAR 类型, length 可以小于字段的实际长度,如果是BLOB和TEXT类型就必须指定长度。</p>
-<p>1.2）唯一索引，与普通索引类似，但是不同的是唯一索引要求所有的列的值是唯一的，这一点和主键索引一样，但是它允许有空值。</p>
-<p>其 sql 格式是：</p>
-<pre><code>CREATE UNIQUE INDEX IndexName ON `TableName`(`字段名`(length));
-# 或者
-ALTER TABLE TableName ADD UNIQUE (column_list); 
-</code></pre>
-<p>第一种方式</p>
-<pre><code>CREATE UNIQUE INDEX account_UNIQUE_Index ON `award`(`account`);
-</code></pre>
-<p>1.3）主键索引，不允许有空值,（在 B+Tree 中的 InnoDB 引擎中，主键索引起到了至关重要的位置）</p>
-<p>主键索引建立的规则是 int 优于 varchar，一般在建表的时候创建，最好是与表的其他字段不相关的列或者是业务不相关的列。一般会设为 int 而且是 AUTO_INCREMENT 自增类型的。</p>
-<ol start="2">
-<li>组合索引</li>
-</ol>
-<p>一个表中含有多个单例索引不代表是组合索引，通俗一点讲，组合索引是：包含多个字段但是只有索引名称。</p>
-<p>其 sql 格式是：</p>
-<pre><code>CREATE INDEX nickname_account_createdTime_Index ON `award`(`nickname`, `account`, `created_time`);
-</code></pre>
-<p><img src="https://upload-images.jianshu.io/upload_images/5114528-706c6315f0abee2e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1200/format/webp" alt="avatar"></p>
-<p>如果你建立了组合索引 (nickname_account_createdTime_Index)，那么它实际包含的是 3 个索引 (nickname) (nickname,account)(nickname,account,created_time)</p>
-<p>在使用查询的时候遵循 mysql 组合索引的 “最左前缀”，即索引 where 时的条件要按照建立索引的时候字段的排列方式。</p>
-<p>1、不按索引最左列开始查询（多列索引） 例如</p>
-<pre><code> index(‘c1’, ‘c2’, ‘c3’) where c2 = &#39;aaa&#39; # 不使用索引
- where c2 = &#39;aaa&#39; and c3=&#39;sss&#39; # 不能使用索引
-</code></pre>
-<p>2、查询某个列有范围查询，则其右边的所有列都无法使用查询（多列查询）</p>
-<pre><code>Where c1= &#39;xxx&#39; and c2 like &#39;aa%&#39; and c3=&#39;sss&#39;
-# 该查询只会使用索引中的前两列,因为like是范围查询
-</code></pre>
-<p>3、不能跳过某个字段来进行查询，这样利用不到索引，比如：</p>
-<pre><code>EXPLAIN SELECT * FROM `award` WHERE nickname &gt; &#39;rSUQFzpkDz3R&#39; AND account = &#39;DYxJoqZq2rd7&#39; AND created_time = 1449567822; 
-</code></pre>
-<p>因为我的索引是 (nickname, account, created_time)，如果第一个字段出现 范围符号 的查找，那么将不会用到索引，如果我是第二个或者第三个字段使用范围符号的查找，那么它会利用索引，利用的索引是 (nickname)，因为上面说了建立组合索引 (nickname, account, created_time)，会出现三个索引。</p>
-<p><img src="https://upload-images.jianshu.io/upload_images/5114528-e89fefe045067907.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1200/format/webp" alt="avatar"></p>
-<p>注：使用组合检索的时候可能需要把前面创建的单例检索删除，否则可能会使用单例检索</p>
-<p>3.全文索引</p>
-<p>文本字段上（text）如果建立的是普通索引，那么只有对文本的字段内容前面的字符进行索引，其字符大小根据索引建立索引时声明的大小来规定。</p>
-<p>如果文本中出现多个一样的字符，而且需要查找的话，那么其条件只能是 where column like ‘%xxxx%’， 这样做会让索引失效</p>
-<p>这个时候全文索引就有作用了</p>
-<pre><code>ALTER TABLE TableName ADD FULLTEXT(column1, column2);
-
-ALTER TABLE `award` ADD FULLTEXT(`message`);
-</code></pre>
-<p>ALTER TABLE <code>award</code> ADD FULLTEXT(<code>message</code>);<br>有了全文索引，就可以用 SELECT 查询命令去检索那些包含着一个或多个给定单词的数据记录了。</p>
-<pre><code>SELECT * FROM TableName WHERE MATCH(column1, column2) AGAINST(&#39;xxx&#39;, &#39;sss&#39;, &#39;ddd&#39;);
-
-SELECT * FROM TableName WHERE MATCH(column1, column2) AGAINST(&#39;xxx&#39;, &#39;sss&#39;, &#39;ddd&#39;);
-</code></pre>
-<p><img src="https://upload-images.jianshu.io/upload_images/5114528-1940bc1006952c47.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1200/format/webp" alt="avatar"></p>
-<h3 id="使用索引的优点"><a href="#使用索引的优点" class="headerlink" title="使用索引的优点"></a>使用索引的优点</h3><p>1）可以通过建立唯一索引或者主键索引，保证数据库表中每一行数据的唯一性</p>
-<p>2）建立索引可以大大提高检索的数据，以及减少表的检索行数</p>
-<p>3）在表连接的连接条件，可以加速表与表直接的相连</p>
-<p>4）在分组和排序字句进行数据检索，可以减少查询时间中 分组 和 排序 所消耗的时间（数据库的记录会重新排序）</p>
-<p>5）建立索引，在查询中使用索引，可以提高性能</p>
-<h3 id="使用索引的缺点"><a href="#使用索引的缺点" class="headerlink" title="使用索引的缺点"></a>使用索引的缺点</h3><p>1）创建索引和维护索引会消耗时间，随着数据量的增加而增加</p>
-<p>2）索引文件会占用物理空间，除了数据表需要占用物理空间之外，每一个索引还会占用一定的物理空间</p>
-<p>3）当对表的数据进行 INSERT,UPDATE,DELETE 的时候,索引也要动态的维护,这样就会降低数据的维护速度,(建立索引会占用磁盘空间的索引文件。一般情况这个问题不太严重，但如果你在一个大表上创建了多种组合索引，索引文件的会膨胀很快)。</p>
-<h3 id="五-使用索引需要注意的地方"><a href="#五-使用索引需要注意的地方" class="headerlink" title="(五) 使用索引需要注意的地方"></a>(五) 使用索引需要注意的地方</h3><p>在建立索引的时候应该考虑索引该建立在数据库表中的某些列上，哪一些索引需要建立，哪一些索引是多余的，一般来说：</p>
-<p>1）在经常需要搜索的列上,可以加快索引的速度</p>
-<p>2）主键列上可以确保列的唯一性</p>
-<p>3）在表与表的连接条件上加上索引,可以加快连接查询的速度</p>
-<p>4）在经常需要排序 (order by) ,分组 (group by) 和的 distinct 列上加索引 可以加快排序查询的时间, (单独order by 用不了索引，索引考虑加where 或加limit)</p>
-<p>5）在一些 where 之后的 &lt; &lt;= &gt; &gt;= BETWEEN IN 以及某个情况下的like 建立字段的索引(B-TREE)</p>
-<p>6）like语句，前导模糊查询 like “%XXX” 不能使用索引，而非前导模糊查询 like “XXX%” 则可以</p>
-<p>7）索引不会包含 NULL 列,如果列中包含 NULL 值都将不会被包含在索引中,复合索引中如果有一列含有NULL值那么这个组合索引都将失效,一般需要给默认值0或者 ‘ ‘ 字符串</p>
-<p>8）使用短索引,如果你的一个字段是 Char(32) 或者 int(32) ,在创建索引的时候指定前缀长度 比如前10个字符 (前提是多数值是唯一的..)那么短索引可以提高查询速度,并且可以减少磁盘的空间,也可以减少I/0操作.</p>
-<p>9）不要在列上进行运算,这样会使得mysql索引失效,也会进行全表扫描</p>
-<p>10）选择越小的数据类型越好,因为通常越小的数据类型通常在磁盘,内存,cpu,缓存中 占用的空间很少,处理起来更快</p>
-<h3 id="六-什么情况下不创建索引"><a href="#六-什么情况下不创建索引" class="headerlink" title="(六) 什么情况下不创建索引"></a>(六) 什么情况下不创建索引</h3><p>1）查询中很少使用到的列不应该创建索引,如果建立了索引然而还会降低mysql的性能和增大了空间需求.</p>
-<p>2）很少数据的列也不应该建立索引,比如 一个性别字段 0或者1,在查询中,结果集的数据占了表中数据行的比例比较大,mysql需要扫描的行数很多,增加索引,并不能提高效率</p>
-<p>3）定义为 text 和 image 和 bit 数据类型的列不应该增加索引</p>
-<p>4）当表的修改(UPDATE,INSERT,DELETE)操作远远大于检索(SELECT)操作时不应该创建索引,这两个操作是互斥的关系</p>
-<h3 id="七-MySQL-优化之道"><a href="#七-MySQL-优化之道" class="headerlink" title="(七) MySQL 优化之道"></a>(七) MySQL 优化之道</h3><p>一些常见的 SQL 实践</p>
+<h4 id="3-那些aop的术语"><a href="#3-那些aop的术语" class="headerlink" title="3.那些aop的术语"></a>3.那些aop的术语</h4><p>　　初看这么多术语，一下子都不好接受，慢慢来，很快就会搞懂。</p>
 <ul>
-<li><p>负向条件不能使用索引</p>
-<p>  select from order where status!=0 and status!=1</p>
-<p>  not in/not exists # 都不是好习惯</p>
+<li><p>1.通知（Advice）<br>　　就是你想要的功能，也就是上面说的 安全，事物，日志等。你给先定义好把，然后在想用的地方用一下。</p>
+</li>
+<li><p> 2.连接点（JoinPoint）<br>　　这个更好解释了，就是spring允许你使用通知的地方，那可真就多了，基本每个方法的前，后（两者都有也行），或抛出异常时都可以是连接点，spring只支持方法连接点.其他如aspectJ还可以让你在构造器或属性注入时都行，不过那不是咱关注的，只要记住，和方法有关的前前后后（抛出异常），都是连接点。</p>
+</li>
+<li><p>3.切入点（Pointcut）<br>　　上面说的连接点的基础上，来定义切入点，你的一个类里，有15个方法，那就有几十个连接点了对把，但是你并不想在所有方法附近都使用通知（使用叫织入，以后再说），你只想让其中的几个，在调用这几个方法之前，之后或者抛出异常时干点什么，那么就用切点来定义这几个方法，让切点来筛选连接点，选中那几个你想要的方法。</p>
+</li>
+<li><p>4.切面（Aspect）<br>　　切面是通知和切入点的结合。现在发现了吧，没连接点什么事情，连接点就是为了让你好理解切点，搞出来的，明白这个概念就行了。通知说明了干什么和什么时候干（什么时候通过方法名中的before,after，around等就能知道），而切入点说明了在哪干（指定到底是哪个方法），这就是一个完整的切面定义。</p>
+</li>
+<li><p>5.引入（introduction）<br>　　允许我们向现有的类添加新方法属性。这不就是把切面（也就是新方法属性：通知定义的）用到目标类中吗</p>
+</li>
+<li><p>6.目标（target）<br>　　引入中所提到的目标类，也就是要被通知的对象，也就是真正的业务逻辑，他可以在毫不知情的情况下，被咱们织入切面。而自己专注于业务本身的逻辑。</p>
+</li>
+<li><p>7.代理(proxy)<br>　　怎么实现整套aop机制的，都是通过代理，这个一会给细说。</p>
+</li>
+<li><p>8.织入(weaving)<br>　　把切面应用到目标对象来创建新的代理对象的过程。有3种方式，spring采用的是运行时，为什么是运行时，后面解释。</p>
 </li>
 </ul>
-<p>可以优化为 in 查询：<br>    select from order where status in(2,3)</p>
+<p>　　关键就是：切点定义了哪些连接点会得到通知</p>
+<h4 id="4-我所理解的aop原理"><a href="#4-我所理解的aop原理" class="headerlink" title="4.我所理解的aop原理"></a>4.我所理解的aop原理</h4><p>　　spring用代理类包裹切面，把他们织入到Spring管理的bean中。也就是说代理类伪装成目标类，它会截取对目标类中方法的调用，让调用者对目标类的调用都先变成调用伪装类，伪装类中就先执行了切面，再把调用转发给真正的目标bean。</p>
+<p>　　现在可以自己想一想，怎么搞出来这个伪装类，才不会被调用者发现（过JVM的检查，JAVA是强类型检查，哪里都要检查类型）。</p>
 <ul>
-<li><p>前导模糊查询不能使用索引</p>
-<p>  select from order where desc like ‘%XX’</p>
-</li>
+<li>1.实现和目标类相同的接口，我也实现和你一样的接口，反正上层都是接口级别的调用，这样我就伪装成了和目标类一样的类（实现了同一接口，咱是兄弟了），也就逃过了类型检查，到java运行期的时候，利用多态的后期绑定（所以spring采用运行时），伪装类（代理类）就变成了接口的真正实现，而他里面包裹了真实的那个目标类，最后实现具体功能的还是目标类，只不过伪装类在之前干了点事情（写日志，安全检查，事物等）。</li>
 </ul>
-<p>而非前导模糊查询则可以：</p>
-<pre><code>select from order where desc like &#39;XX%&#39;
-</code></pre>
+<p>　　这就好比，一个人让你办件事，每次这个时候，你弟弟就会先出来，当然他分不出来了，以为是你，你这个弟弟虽然办不了这事，但是他知道你能办，所以就答应下来了，并且收了点礼物（写日志），收完礼物了，给把事给人家办了啊，所以你弟弟又找你这个哥哥来了，最后把这是办了的还是你自己。但是你自己并不知道你弟弟已经收礼物了，你只是专心把这件事情做好。</p>
+<p>　　顺着这个思路想，要是本身这个类就没实现一个接口呢，你怎么伪装我，我就压根没有机会让你搞出这个双胞胎的弟弟，那么就用第2种代理方式，创建一个目标类的子类，生个儿子，让儿子伪装我</p>
 <ul>
-<li><p>数据区分度不大的字段不宜使用索引</p>
-<p>  select from user where sex=1</p>
-</li>
+<li>2.生成子类调用，这次用子类来做为伪装类，当然这样也能逃过JVM的强类型检查，我继承的吗，当然查不出来了，子类重写了目标类的所有方法，当然在这些重写的方法中，不仅实现了目标类的功能，还在这些功能之前，实现了一些其他的（写日志，安全检查，事物等）。</li>
 </ul>
-<p>原因：性别只有男，女，每次过滤掉的数据很少，不宜使用索引。</p>
-<p>经验上，能过滤80%数据时就可以使用索引。对于订单状态，如果状态值很少，不宜使用索引，如果状态值很多，能够过滤大量数据，则应该建立索引。</p>
-<ul>
-<li><p>在属性上进行计算不能命中索引</p>
-<p>  select from order_ where YEAR(date) &lt;= ‘2017’</p>
-</li>
-</ul>
-<p>即使 date 上建立了索引，也会全表扫描，可优化为值计算：</p>
-<pre><code>select from order_ where date &lt;= CURDATE()
-</code></pre>
-<p>或者：</p>
-<pre><code>select from order_ where date &lt; = &#39;2017-01-01&#39;
-</code></pre>
-<p>并非周知的 SQL 实践</p>
-<ul>
-<li><p>如果业务大部分是单条查询，使用 Hash 索引性能更好，例如用户中心</p>
-<p>  select from <code>user</code> where uid = ?<br>  select from user where login_name=?</p>
-</li>
-</ul>
-<p>原因：B-Tree索引的时间复杂度是 O(log(n))；Hash 索引的时间复杂度是 O(1)</p>
-<ul>
-<li>允许 null的列，查询有潜在大坑</li>
-</ul>
-<p>单列索引不存 null 值，复合索引不存全为 null 的值，如果列允许为 null，可能会得到“不符合预期”的结果集</p>
-<pre><code>select from user where name != &#39;shenjian&#39;
-</code></pre>
-<p>如果 name 允许为 null，索引不存储null值，结果集中不会包含这些记录。所以，请使用 not null 约束以及默认值。</p>
-<ul>
-<li>复合索引最左前缀，并不是指 SQL 语句的 where顺序要和符合索引一致。</li>
-</ul>
-<p>用户中心建立了 (login_name, password) 的符合索引</p>
-<pre><code>select from user where login_name=? and passwd=?
-select from user where passwd=? and login_name=?
-</code></pre>
-<p>都能够命中索引</p>
-<pre><code>select from user where login_name=?
-</code></pre>
-<p>也能命中索引，满足符合索引最左前缀</p>
-<pre><code>select from user where passwd=?
-</code></pre>
-<p>不能命中索引，不满足符合索引最左前缀。</p>
-<ul>
-<li>使用 ENUM 而不是字符串</li>
-</ul>
-<p>ENUM 保存的是 TINYINT，别在枚举中搞一些“中国”“北京”“技术部”这样的字符串，字符串空间又大，效率又低。</p>
-<p><strong>小众但有用的 SQL 实践</strong></p>
-<ul>
-<li><p>如果明确知道只有一条结果返回，limit 1 能够提高效率</p>
-<p>  select from user where login_name=?</p>
-</li>
-</ul>
-<p>可以优化为：</p>
-<p>select from user where login_name=? limit 1</p>
-<p>原因：你知道只有一条结果，但数据库并不知道，明确告诉它，让它主动停止游标移动</p>
-<ul>
-<li>把计算放到业务层而不是数据库层，除了节省数据的 CPU，还有意想不到的查询缓存优化效果</li>
-</ul>
-<pre><code>select from order where date &lt; = CURDATE()
-</code></pre>
-<p>这不是一个号的 SQL 实践，应该优化为：</p>
-<pre><code>$curDate = date(&#39;Y-m-d&#39;);
-$res = mysqlquery(&#39;select from order where date &lt; = $curDate&#39;);
-</code></pre>
-<p>原因：释放了数据库的 CPU，多次调用，传入的SQL相同，才可以利用查询缓存</p>
-<ul>
-<li>强制类型转换会全表扫描  select from user where phone=13800001234</li>
-</ul>
+<p>　　这次的对比就是，儿子先从爸爸那把本事都学会了，所有人都找儿子办事情，但是儿子每次办和爸爸同样的事之前，都要收点小礼物（写日志），然后才去办真正的事。当然爸爸是不知道儿子这么干的了。这里就有件事情要说，某些本事是爸爸独有的(final的)，儿子学不了，学不了就办不了这件事，办不了这个事情，自然就不能收人家礼了。</p>
+<p>　　前一种兄弟模式，spring会使用JDK的java.lang.reflect.Proxy类，它允许Spring动态生成一个新类来实现必要的接口，织入通知，并且把对这些接口的任何调用都转发到目标类。</p>
+<p>　　后一种父子模式，spring使用CGLIB库生成目标类的一个子类，在创建这个子类的时候，spring织入通知，并且把对这个子类的调用委托到目标类。</p>
+<p>　　相比之下，还是兄弟模式好些，他能更好的实现松耦合，尤其在今天都高喊着面向接口编程的情况下，父子模式只是在没有实现接口的时候，也能织入通知，应当做一种例外。</p>
 
                 
             </div>
@@ -709,7 +545,7 @@ $res = mysqlquery(&#39;select from order where date &lt; = $curDate&#39;);
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://wangtianyu-ui.github.io/2020/12/10/Mysql%E7%B4%A2%E5%BC%95/">https://wangtianyu-ui.github.io/2020/12/10/Mysql%E7%B4%A2%E5%BC%95/</a>
+                    <a href="https://wangtianyu-ui.github.io/2021/01/01/Spring%20AOP%E7%90%86%E8%A7%A3/">https://wangtianyu-ui.github.io/2021/01/01/Spring%20AOP%E7%90%86%E8%A7%A3/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -747,8 +583,8 @@ $res = mysqlquery(&#39;select from order where date &lt; = $curDate&#39;);
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/Mysql/">
-                                    <span class="chip bg-color">Mysql</span>
+                                <a href="/tags/Spring/">
+                                    <span class="chip bg-color">Spring</span>
                                 </a>
                             
                         </div>
@@ -920,17 +756,18 @@ $res = mysqlquery(&#39;select from order where date &lt; = $curDate&#39;);
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
-                <a href="/2020/12/20/Spring%20IOC%E7%90%86%E8%A7%A3/">
+                <a href="/2021/01/01/Spring%20AOP%E7%90%86%E8%A7%A3/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/23.jpg" class="responsive-img" alt="Spring IOC理解">
+                        <img src="/medias/featureimages/4.jpg" class="responsive-img" alt="Spring AOP理解">
                         
-                        <span class="card-title">Spring IOC理解</span>
+                        <span class="card-title">Spring AOP理解</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -940,9 +777,9 @@ $res = mysqlquery(&#39;select from order where date &lt; = $curDate&#39;);
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2020-12-20
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-01-01
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -955,6 +792,7 @@ $res = mysqlquery(&#39;select from order where date &lt; = $curDate&#39;);
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
@@ -973,13 +811,13 @@ $res = mysqlquery(&#39;select from order where date &lt; = $curDate&#39;);
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2020/11/12/Dubbo%E5%85%A5%E9%97%A8/">
+                <a href="/2020/12/20/Spring%20IOC%E7%90%86%E8%A7%A3/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/7.jpg" class="responsive-img" alt="Dubbo入门">
+                        <img src="/medias/featureimages/23.jpg" class="responsive-img" alt="Spring IOC理解">
                         
-                        <span class="card-title">Dubbo入门</span>
+                        <span class="card-title">Spring IOC理解</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -990,14 +828,14 @@ $res = mysqlquery(&#39;select from order where date &lt; = $curDate&#39;);
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2020-11-12
+                                <i class="far fa-clock fa-fw icon-date"></i>2020-12-20
                             </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Dubbo/" class="post-category">
-                                    Dubbo
+                            <a href="/categories/Spring/" class="post-category">
+                                    Spring
                                 </a>
                             
                             
@@ -1007,8 +845,8 @@ $res = mysqlquery(&#39;select from order where date &lt; = $curDate&#39;);
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Dubbo/">
-                        <span class="chip bg-color">Dubbo</span>
+                    <a href="/tags/Spring/">
+                        <span class="chip bg-color">Spring</span>
                     </a>
                     
                 </div>
