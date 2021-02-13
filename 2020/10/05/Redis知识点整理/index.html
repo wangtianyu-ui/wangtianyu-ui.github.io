@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="Mysql高性能优化规范建议, 王添俞的博客">
+    <meta name="keywords" content="Redis知识点整理, 王添俞的博客">
     <meta name="description" content="">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Mysql高性能优化规范建议 | 王添俞的博客</title>
+    <title>Redis知识点整理 | 王添俞的博客</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -310,12 +310,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/19.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/17.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Mysql高性能优化规范建议</h1>
+                    <h1 class="description center-align post-title">Redis知识点整理</h1>
                 </div>
             </div>
         </div>
@@ -431,8 +431,8 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/Mysql/">
-                                <span class="chip bg-color">Mysql</span>
+                            <a href="/tags/Redis/">
+                                <span class="chip bg-color">Redis</span>
                             </a>
                         
                     </div>
@@ -443,8 +443,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Mysql/" class="post-category">
-                                Mysql
+                            <a href="/categories/Redis/" class="post-category">
+                                Redis
                             </a>
                         
                     </div>
@@ -456,7 +456,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2020-10-02
+                    2020-10-05
                 </div>
                 
 
@@ -477,171 +477,51 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="数据库命令规范"><a href="#数据库命令规范" class="headerlink" title="数据库命令规范"></a>数据库命令规范</h3><ul>
-<li>所有数据库对象名称必须使用小写字母并用下划线分割</li>
-<li>所有数据库对象名称禁止使用 MySQL 保留关键字（如果表名中包含关键字查询时，需要将其用单引号括起来）</li>
-<li>数据库对象的命名要能做到见名识意，并且最后不要超过 32 个字符</li>
-<li>临时库表必须以 tmp_为前缀并以日期为后缀，备份表必须以 bak_为前缀并以日期 (时间戳) 为后缀</li>
-<li>所有存储相同数据的列名和列类型必须一致（一般作为关联列，如果查询时关联列类型不一致会自动进行数据类型隐式转换，会造成列上的索引失效，导致查询效率降低）</li>
-</ul>
-<h3 id="数据库基本设计规范"><a href="#数据库基本设计规范" class="headerlink" title="数据库基本设计规范"></a>数据库基本设计规范</h3><h4 id="1-所有表必须使用-Innodb-存储引擎"><a href="#1-所有表必须使用-Innodb-存储引擎" class="headerlink" title="1. 所有表必须使用 Innodb 存储引擎"></a>1. 所有表必须使用 Innodb 存储引擎</h4><p>没有特殊要求（即 Innodb 无法满足的功能如：列存储，存储空间数据等）的情况下，所有表必须使用 Innodb 存储引擎（MySQL5.5 之前默认使用 Myisam，5.6 以后默认的为 Innodb）。</p>
-<p>Innodb 支持事务，支持行级锁，更好的恢复性，高并发下性能更好。</p>
-<h5 id="2-数据库和表的字符集统一使用-UTF8"><a href="#2-数据库和表的字符集统一使用-UTF8" class="headerlink" title="2. 数据库和表的字符集统一使用 UTF8"></a>2. 数据库和表的字符集统一使用 UTF8</h5><p>兼容性更好，统一字符集可以避免由于字符集转换产生的乱码，不同的字符集进行比较前需要进行转换会造成索引失效，如果数据库中有存储 emoji 表情的需要，字符集需要采用 utf8mb4 字符集。</p>
-<h4 id="3-所有表和字段都需要添加注释"><a href="#3-所有表和字段都需要添加注释" class="headerlink" title="3. 所有表和字段都需要添加注释"></a>3. 所有表和字段都需要添加注释</h4><p>使用 comment 从句添加表和列的备注，从一开始就进行数据字典的维护</p>
-<h4 id="4-尽量控制单表数据量的大小-建议控制在-500-万以内。"><a href="#4-尽量控制单表数据量的大小-建议控制在-500-万以内。" class="headerlink" title="4. 尽量控制单表数据量的大小,建议控制在 500 万以内。"></a>4. 尽量控制单表数据量的大小,建议控制在 500 万以内。</h4><p>500 万并不是 MySQL 数据库的限制，过大会造成修改表结构，备份，恢复都会有很大的问题。</p>
-<p>可以用历史数据归档（应用于日志数据），分库分表（应用于业务数据）等手段来控制数据量大小</p>
-<h4 id="5-谨慎使用-MySQL-分区表"><a href="#5-谨慎使用-MySQL-分区表" class="headerlink" title="5. 谨慎使用 MySQL 分区表"></a>5. 谨慎使用 MySQL 分区表</h4><p>分区表在物理上表现为多个文件，在逻辑上表现为一个表；</p>
-<p>谨慎选择分区键，跨分区查询效率可能更低；</p>
-<p>建议采用物理分表的方式管理大数据。</p>
-<h4 id="6-尽量做到冷热数据分离-减小表的宽度"><a href="#6-尽量做到冷热数据分离-减小表的宽度" class="headerlink" title="6.尽量做到冷热数据分离,减小表的宽度"></a>6.尽量做到冷热数据分离,减小表的宽度</h4><p>MySQL 限制每个表最多存储 4096 列，并且每一行数据的大小不能超过 65535 字节。</p>
-<p>减少磁盘 IO,保证热数据的内存缓存命中率（表越宽，把表装载进内存缓冲池时所占用的内存也就越大,也会消耗更多的 IO）；</p>
-<p>更有效的利用缓存，避免读入无用的冷数据；</p>
-<p>经常一起使用的列放到一个表中（避免更多的关联操作）。</p>
-<h4 id="7-禁止在表中建立预留字段"><a href="#7-禁止在表中建立预留字段" class="headerlink" title="7. 禁止在表中建立预留字段"></a>7. 禁止在表中建立预留字段</h4><p>预留字段的命名很难做到见名识义。</p>
-<p>预留字段无法确认存储的数据类型，所以无法选择合适的类型。</p>
-<p>对预留字段类型的修改，会对表进行锁定。</p>
-<h4 id="8-禁止在数据库中存储图片-文件等大的二进制数据"><a href="#8-禁止在数据库中存储图片-文件等大的二进制数据" class="headerlink" title="8. 禁止在数据库中存储图片,文件等大的二进制数据"></a>8. 禁止在数据库中存储图片,文件等大的二进制数据</h4><p>通常文件很大，会短时间内造成数据量快速增长，数据库进行数据库读取时，通常会进行大量的随机 IO 操作，文件很大时，IO 操作很耗时。</p>
-<p>通常存储于文件服务器，数据库只存储文件地址信息</p>
-<p>####9. 禁止在线上做数据库压力测试<br>####10. 禁止从开发环境,测试环境直接连接生成环境数据库<br>###数据库字段设计规范<br><strong>1. 优先选择符合存储需要的最小的数据类型<br>原因：</strong></p>
-<p>列的字段越大，建立索引时所需要的空间也就越大，这样一页中所能存储的索引节点的数量也就越少也越少，在遍历时所需要的 IO 次数也就越多，索引的性能也就越差。</p>
-<p>方法：</p>
-<p>a.将字符串转换成数字类型存储,如:将 IP 地址转换成整形数据</p>
-<p>MySQL 提供了两个方法来处理 ip 地址</p>
-<p>•inet_aton 把 ip 转为无符号整型 (4-8 位)</p>
-<p>•inet_ntoa 把整型的 ip 转为地址</p>
-<p>插入数据前，先用 inet_aton 把 ip 地址转为整型，可以节省空间，显示数据时，使用 inet_ntoa 把整型的 ip 地址转为地址显示即可。</p>
-<p>b.对于非负型的数据 (如自增 ID,整型 IP) 来说,要优先使用无符号整型来存储</p>
-<p>原因：</p>
-<p>无符号相对于有符号可以多出一倍的存储空间</p>
-<p>SIGNED INT -2147483648<del>2147483647<br>UNSIGNED INT 0</del>4294967295<br>VARCHAR(N) 中的 N 代表的是字符数，而不是字节数，使用 UTF8 存储 255 个汉字 Varchar(255)=765 个字节。过大的长度会消耗更多的内存。</p>
-<p>###2. 避免使用 TEXT,BLOB 数据类型，最常见的 TEXT 类型可以存储 64k 的数据<br><strong>a. 建议把 BLOB 或是 TEXT 列分离到单独的扩展表中</strong></p>
-<p>MySQL 内存临时表不支持 TEXT、BLOB 这样的大数据类型，如果查询中包含这样的数据，在排序等操作时，就不能使用内存临时表，必须使用磁盘临时表进行。而且对于这种数据，MySQL 还是要进行二次查询，会使 sql 性能变得很差，但是不是说一定不能使用这样的数据类型。</p>
-<p>如果一定要使用，建议把 BLOB 或是 TEXT 列分离到单独的扩展表中，查询时一定不要使用 select * 而只需要取出必要的列，不需要 TEXT 列的数据时不要对该列进行查询。</p>
-<p><strong>2、TEXT 或 BLOB 类型只能使用前缀索引</strong></p>
-<p>因为MySQL[1] 对索引字段长度是有限制的，所以 TEXT 类型只能使用前缀索引，并且 TEXT 列上是不能有默认值的</p>
-<p><strong>3. 避免使用 ENUM 类型</strong></p>
-<p>修改 ENUM 值需要使用 ALTER 语句</p>
-<p>ENUM 类型的 ORDER BY 操作效率低，需要额外操作</p>
-<p>禁止使用数值作为 ENUM 的枚举值</p>
-<p><strong>4. 尽可能把所有列定义为 NOT NULL</strong><br>原因：</p>
-<p>索引 NULL 列需要额外的空间来保存，所以要占用更多的空间</p>
-<p>进行比较和计算时要对 NULL 值做特别的处理</p>
-<p><strong>5. 使用 TIMESTAMP(4 个字节) 或 DATETIME 类型 (8 个字节) 存储时间</strong></p>
-<p>TIMESTAMP 存储的时间范围 1970-01-01 00:00:01 ~ 2038-01-19-03:14:07</p>
-<p>TIMESTAMP 占用 4 字节和 INT 相同，但比 INT 可读性高</p>
-<p>超出 TIMESTAMP 取值范围的使用 DATETIME 类型存储</p>
-<p>经常会有人用字符串存储日期型的数据（不正确的做法）</p>
-<p>•缺点 1：无法用日期函数进行计算和比较<br>•缺点 2：用字符串存储日期要占用更多的空间</p>
-<p><strong>6. 同财务相关的金额类数据必须使用 decimal 类型</strong></p>
-<p>•非精准浮点：float,double<br>•精准浮点：decimal</p>
-<p>Decimal 类型为精准浮点数，在计算时不会丢失精度</p>
-<p>占用空间由定义的宽度决定，每 4 个字节可以存储 9 位数字，并且小数点要占用一个字节</p>
-<p>可用于存储比 bigint 更大的整型数据</p>
-<h3 id="索引设计规范"><a href="#索引设计规范" class="headerlink" title="索引设计规范"></a>索引设计规范</h3><h4 id="限制每张表上的索引数量-建议单张表索引不超过-5-个"><a href="#限制每张表上的索引数量-建议单张表索引不超过-5-个" class="headerlink" title="限制每张表上的索引数量,建议单张表索引不超过 5 个"></a>限制每张表上的索引数量,建议单张表索引不超过 5 个</h4><p>索引并不是越多越好！索引可以提高效率同样可以降低效率。</p>
-<p>索引可以增加查询效率，但同样也会降低插入和更新的效率，甚至有些情况下会降低查询效率。</p>
-<p>因为 MySQL 优化器在选择如何优化查询时，会根据统一信息，对每一个可以用到的索引来进行评估，以生成出一个最好的执行计划，如果同时有很多个索引都可以用于查询，就会增加 MySQL 优化器生成执行计划的时间，同样会降低查询性能。</p>
-<h4 id="禁止给表中的每一列都建立单独的索引"><a href="#禁止给表中的每一列都建立单独的索引" class="headerlink" title="禁止给表中的每一列都建立单独的索引"></a>禁止给表中的每一列都建立单独的索引</h4><p>5.6 版本之前，一个 sql 只能使用到一个表中的一个索引，5.6 以后，虽然有了合并索引的优化方式，但是还是远远没有使用一个联合索引的查询方式好。</p>
-<h4 id="每个-Innodb-表必须有个主键"><a href="#每个-Innodb-表必须有个主键" class="headerlink" title="每个 Innodb 表必须有个主键"></a>每个 Innodb 表必须有个主键</h4><p>Innodb 是一种索引组织表：数据的存储的逻辑顺序和索引的顺序是相同的。每个表都可以有多个索引，但是表的存储顺序只能有一种。</p>
-<p>Innodb 是按照主键索引的顺序来组织表的</p>
+                <p>###1. Redis 数据结构<br>####1.主要的数据类型:</p>
 <ul>
-<li>不要使用更新频繁的列作为主键，不适用多列主键（相当于联合索引）</li>
-<li>不要使用 UUID,MD5,HASH,字符串列作为主键（无法保证数据的顺序增长）</li>
-<li>主键建议使用自增 ID 值</li>
+<li><p>String(K-V): 单值，键值对，类似 Memcached， 比如配置，常量值，开关等等。</p>
+</li>
+<li><p>Hash: 一般是存储对象接口，key 是对象的标示，filed 是属性，value 是属性值。</p>
+</li>
+<li><p>Set: 集合，存放不重复的数据，求交集，统计不重复的量。</p>
+</li>
+<li><p>List: 链表，常用在消息队列，TimeLine.</p>
+</li>
+<li><p>SortedSet: 排名，需要根据 一个值来排序的场景，排行榜等。<br>####2.扩展数据类型</p>
+</li>
+<li><p>Pub/Sub 简单的发布/订阅，当订阅的 key 的值有变化的时候，会通知到订阅的客户端，回调。</p>
+</li>
+<li><p>HyperLogLog: 基数统计（B 树，bitmap，概率算法（LC,LLC，HLL）），统计一个大的集合（可能出现重复数据）中不同元素的个数。</p>
+</li>
+<li><p>比如网站的 UV，链接访问的 UV，以及做合并的功能，还有留存。</p>
+</li>
+<li><p>Geo 地址位置信息</p>
+<h4 id="3-Redis-Module-Redis-拓展模块"><a href="#3-Redis-Module-Redis-拓展模块" class="headerlink" title="3.Redis Module : Redis 拓展模块"></a>3.Redis Module : Redis 拓展模块</h4></li>
 </ul>
-<h4 id="4-常见索引列建议"><a href="#4-常见索引列建议" class="headerlink" title="4. 常见索引列建议"></a>4. 常见索引列建议</h4><p>•出现在 SELECT、UPDATE、DELETE 语句的 WHERE 从句中的列<br>•包含在 ORDER BY、GROUP BY、DISTINCT 中的字段<br>•并不要将符合 1 和 2 中的字段的列都建立一个索引， 通常将 1、2 中的字段建立联合索引效果更好<br>•多表 join 的关联列</p>
-<p>####5.如何选择索引列的顺序<br>建立索引的目的是：希望通过索引进行数据查找，减少随机 IO，增加查询性能 ，索引能过滤出越少的数据，则从磁盘中读入的数据也就越少。</p>
-<p>•区分度最高的放在联合索引的最左侧（区分度=列中不同值的数量/列的总行数）<br>•尽量把字段长度小的列放在联合索引的最左侧（因为字段长度越小，一页能存储的数据量越大，IO 性能也就越好）<br>•使用最频繁的列放到联合索引的左侧（这样可以比较少的建立一些索引）</p>
-<h4 id="避免建立冗余索引和重复索引（增加了查询优化器生成执行计划的时间）"><a href="#避免建立冗余索引和重复索引（增加了查询优化器生成执行计划的时间）" class="headerlink" title="避免建立冗余索引和重复索引（增加了查询优化器生成执行计划的时间）"></a>避免建立冗余索引和重复索引（增加了查询优化器生成执行计划的时间）</h4><p>•重复索引示例：primary key(id)、index(id)、unique index(id)<br>•冗余索引示例：index(a,b,c)、index(a,b)、index(a)</p>
-<h4 id="对于频繁的查询优先考虑使用覆盖索引"><a href="#对于频繁的查询优先考虑使用覆盖索引" class="headerlink" title="对于频繁的查询优先考虑使用覆盖索引"></a>对于频繁的查询优先考虑使用覆盖索引</h4><p>覆盖索引：就是包含了所有查询字段 (where,select,ordery by,group by 包含的字段) 的索引</p>
-<p>覆盖索引的好处：</p>
+<p>#####BloomFilter: 布隆过滤器，快速判断一个元素是否在集合中。</p>
 <ul>
-<li>避免 Innodb 表进行索引的二次查询: Innodb 是以聚集索引的顺序来存储的，对于 Innodb 来说，二级索引在叶子节点中所保存的是行的主键信息，如果是用二级索引查询数据的话，在查找到相应的键值后，还要通过主键进行二次查询才能获取我们真实所需要的数据。而在覆盖索引中，二级索引的键值中可以获取所有的数据，避免了对主键的二次查询 ，减少了 IO 操作，提升了查询效率。</li>
-<li>可以把随机 IO 变成顺序 IO 加快查询效率: 由于覆盖索引是按键值的顺序存储的，对于 IO 密集型的范围查找来说，对比随机从磁盘读取每一行的数据 IO 要少的多，因此利用覆盖索引在访问时也可以把磁盘的随机读取的 IO 转变成索引查找的顺序 IO。</li>
+<li>就是一个很长的二进制 bit 位的数组，全部初始化为 0.</li>
+<li>K 个 hash 函数，每个 hash 函数会生成一个 hash 值。这个 hash 值对应了二进制 数组的某个点,然后将这个点标记为 1.</li>
+<li>查询一个数据存在不存在时，需要判断 这 K 个点的位置是否都未为 1.</li>
+<li>布隆过滤器添加元素<br>1.将要添加的元素给k个哈希函数<br>2.得到对应于位数组上的k个位置<br>3.将这k个位置设为1<br>布隆过滤器查询元素<br>将要查询的元素给k个哈希函数<br>得到对应于位数组上的k个位置<br>如果k个位置有一个为0，则肯定不在集合中<br>如果k个位置全部为1，则可能在集合中<br>优点: 是占用空间小，效率高。<br>缺点: 有误判，不允许删除。如果需要删除，可以CBF,每一位是一个 counter，不再是0和1两种结果。<br>RedisSearch</li>
 </ul>
-<h4 id="8-索引-SET-规范"><a href="#8-索引-SET-规范" class="headerlink" title="8.索引 SET 规范"></a>8.索引 SET 规范</h4><p>尽量避免使用外键约束</p>
-<ul>
-<li>不建议使用外键约束（foreign key），但一定要在表与表之间的关联键上建立索引</li>
-<li>外键可用于保证数据的参照完整性，但建议在业务端实现</li>
-<li>外键会影响父表和子表的写操作从而降低性能</li>
-</ul>
-<p>###数据库 SQL 开发规范<br><strong>1. 建议使用预编译语句进行数据库操作</strong></p>
-<p>预编译语句可以重复使用这些计划，减少 SQL 编译所需要的时间，还可以解决动态 SQL 所带来的 SQL 注入的问题。</p>
-<p>只传参数，比传递 SQL 语句更高效。</p>
-<p>相同语句可以一次解析，多次使用，提高处理效率。</p>
-<p><strong>2. 避免数据类型的隐式转换</strong></p>
-<p>隐式转换会导致索引失效如:</p>
-<p>select name,phone from customer where id = ‘111’;</p>
-<p><strong>3. 充分利用表上已经存在的索引</strong></p>
-<p>避免使用双%号的查询条件。如：a like ‘%123%’，（如果无前置%,只有后置%，是可以用到列上的索引的）</p>
-<p>一个 SQL 只能利用到复合索引中的一列进行范围查询。如：有 a,b,c 列的联合索引，在查询条件中有 a 列的范围查询，则在 b,c 列上的索引将不会被用到。</p>
-<p>在定义联合索引时，如果 a 列要用到范围查找的话，就要把 a 列放到联合索引的右侧，使用 left join 或 not exists 来优化 not in 操作，因为 not in 也通常会使用索引失效。</p>
-<p><strong>4. 数据库设计时，应该要对以后扩展进行考虑</strong></p>
-<p><strong>5. 程序连接不同的数据库使用不同的账号，进制跨库查询</strong></p>
-<ul>
-<li>为数据库迁移和分库分表留出余地</li>
-<li>降低业务耦合度</li>
-<li>避免权限过大而产生的安全风险</li>
-</ul>
-<p>*<em>6. 禁止使用 SELECT * 必须使用 SELECT &lt;字段列表&gt; 查询*</em></p>
-<p>原因：</p>
-<p>•消耗更多的 CPU 和 IO 以网络带宽资源<br>•无法使用覆盖索引<br>•可减少表结构变更带来的影响</p>
-<p><strong>7. 禁止使用不含字段列表的 INSERT 语句</strong></p>
-<p>如：</p>
-<p>insert into values (‘a’,’b’,’c’);<br>应使用：</p>
-<p>insert into t(c1,c2,c3) values (‘a’,’b’,’c’);<br><strong>8. 避免使用子查询，可以把子查询优化为 join 操作</strong></p>
-<p>通常子查询在 in 子句中，且子查询中为简单 SQL(不包含 union、group by、order by、limit 从句) 时,才可以把子查询转化为关联查询进行优化。</p>
-<p>子查询性能差的原因：</p>
-<p>子查询的结果集无法使用索引，通常子查询的结果集会被存储到临时表中，不论是内存临时表还是磁盘临时表都不会存在索引，所以查询性能会受到一定的影响。特别是对于返回结果集比较大的子查询，其对查询性能的影响也就越大。</p>
-<p>由于子查询会产生大量的临时表也没有索引，所以会消耗过多的 CPU 和 IO 资源，产生大量的慢查询。</p>
-<p><strong>9. 避免使用 JOIN 关联太多的表</strong></p>
-<p>对于 MySQL 来说，是存在关联缓存的，缓存的大小可以由 join_buffer_size 参数进行设置。</p>
-<p>在 MySQL 中，对于同一个 SQL 多关联（join）一个表，就会多分配一个关联缓存，如果在一个 SQL 中关联的表越多，所占用的内存也就越大。</p>
-<p>如果程序中大量的使用了多表关联的操作，同时 join_buffer_size 设置的也不合理的情况下，就容易造成服务器内存溢出的情况，就会影响到服务器数据库性能的稳定性。</p>
-<p>同时对于关联操作来说，会产生临时表操作，影响查询效率，MySQL 最多允许关联 61 个表，建议不超过 5 个。</p>
-<p><strong>10. 减少同数据库的交互次数</strong></p>
-<p>数据库更适合处理批量操作，合并多个相同的操作到一起，可以提高处理效率。</p>
-<p><strong>11. 对应同一列进行 or 判断时，使用 in 代替 or</strong></p>
-<p>in 的值不要超过 500 个，in 操作可以更有效的利用索引，or 大多数情况下很少能利用到索引。</p>
-<p><strong>12. 禁止使用 order by rand() 进行随机排序</strong></p>
-<p>order by rand() 会把表中所有符合条件的数据装载到内存中，然后在内存中对所有数据根据随机生成的值进行排序，并且可能会对每一行都生成一个随机值，如果满足条件的数据集非常大，就会消耗大量的 CPU 和 IO 及内存资源。</p>
-<p>推荐在程序中获取一个随机值，然后从数据库中获取数据的方式。</p>
-<p><strong>13. WHERE 从句中禁止对列进行函数转换和计算</strong></p>
-<p>对列进行函数转换或计算时会导致无法使用索引</p>
-<p>不推荐：</p>
-<p>where date(create_time)=’20190101’<br>推荐：</p>
-<p>where create_time &gt;= ‘20190101’ and create_time &lt; ‘20190102’<br><strong>14. 在明显不会有重复值时使用 UNION ALL 而不是 UNION</strong></p>
-<p>•UNION 会把两个结果集的所有数据放到临时表中后再进行去重操作<br>•UNION ALL 不会再对结果集进行去重操作</p>
-<p><strong>15. 拆分复杂的大 SQL 为多个小 SQL</strong></p>
-<ul>
-<li>大 SQL 逻辑上比较复杂，需要占用大量 CPU 进行计算的 SQL</li>
-<li>MySQL 中，一个 SQL 只能使用一个 CPU 进行计算</li>
-<li>SQL 拆分后可以通过并行执行来提高处理效率</li>
-</ul>
-<h3 id="数据库操作行为规范"><a href="#数据库操作行为规范" class="headerlink" title="数据库操作行为规范"></a>数据库操作行为规范</h3><p><strong>1. 超 100 万行的批量写 (UPDATE,DELETE,INSERT) 操作,要分批多次进行操作</strong></p>
-<p>大批量操作可能会造成严重的主从延迟</p>
-<p>主从环境中,大批量操作可能会造成严重的主从延迟，大批量的写操作一般都需要执行一定长的时间， 而只有当主库上执行完成后，才会在其他从库上执行，所以会造成主库与从库长时间的延迟情况</p>
-<p>binlog 日志为 row 格式时会产生大量的日志</p>
-<p>大批量写操作会产生大量日志，特别是对于 row 格式二进制数据而言，由于在 row 格式中会记录每一行数据的修改，我们一次修改的数据越多，产生的日志量也就会越多，日志的传输和恢复所需要的时间也就越长，这也是造成主从延迟的一个原因</p>
-<p>避免产生大事务操作</p>
-<p>大批量修改数据，一定是在一个事务中进行的，这就会造成表中大批量数据进行锁定，从而导致大量的阻塞，阻塞会对 MySQL 的性能产生非常大的影响。</p>
-<p>特别是长时间的阻塞会占满所有数据库的可用连接，这会使生产环境中的其他应用无法连接到数据库，因此一定要注意大批量写操作要进行分批</p>
-<p><strong>2. 对于大表使用 pt-online-schema-change 修改表结构</strong></p>
-<ul>
-<li>避免大表修改产生的主从延迟</li>
-<li>避免在对表字段进行修改时进行锁表</li>
-</ul>
-<p>对大表数据结构的修改一定要谨慎，会造成严重的锁表操作，尤其是生产环境，是不能容忍的。</p>
-<p>pt-online-schema-change 它会首先建立一个与原表结构相同的新表，并且在新表上进行表结构的修改，然后再把原表中的数据复制到新表中，并在原表中增加一些触发器。把原表中新增的数据也复制到新表中，在行所有数据复制完成之后，把新表命名成原表，并把原来的表删除掉。把原来一个 DDL 操作，分解成多个小的批次进行。</p>
-<p><strong>3. 禁止为程序使用的账号赋予 super 权限</strong></p>
-<ul>
-<li>当达到最大连接数限制时，还运行 1 个有 super 权限的用户连接</li>
-<li>super 权限只能留给 DBA 处理问题的账号使用</li>
-</ul>
-<p><strong>4. 对于程序连接数据库账号,遵循权限最小原则</strong></p>
-<ul>
-<li>程序使用数据库账号只能在一个 DB 下使用，不准跨库</li>
-<li>程序使用的账号原则上不准有 drop 权限</li>
-</ul>
+<p>Redis-ML，</p>
+<ol start="2">
+<li>Redis 分布式锁<br>setnx抢锁，然后设置一个 过期时间。不能先 set 抢锁，再 expire，必须保证原子性。<br>spring-data-redis:2.1版本后，使用 setIfAbsent(K key, V value, long timeout, TimeUnit unit) 方法来实现。</li>
+<li>Redis 查找指定格式的 key<br>如果使用 keys ，但是会卡住 redis，因为 redis 是单线程的。所以可以用 scan，但是会有重复，需要客户端做一次去重复。</li>
+<li>Redis 做异步队列<br>一般用 list 作为队列，rpush 生产消息，lpop 消费消息。当 lpop 没有消息的时候，适当的 sleep 一定的时间再重试，如果不用 sleep。可以用 blpop 命令，如果没有消息，会一直阻塞到消息来为止。<br>通过 pub/sub 订阅者模式 来做一次生产，多次消费，可以实现 1:N 的消息队列。pub/sub 的缺点是，在消费者下线过后，生产的消息会丢失，如果需要保证不丢失，需要使用 MQ.<br>redis 实现延时队列，用时间戳做 score，消息内容做 member, 然后通过 ZADD 添加消息，消费者用 zrangebyscore 指令获取 N 秒之前的数据轮询处理。不过不建议，太占用内容。队列还是建议使用 MQ, Kafka</li>
+<li>key 的过期时间<br>如果有大量的 key 在同一个时间过期，防止 redis 暂时的卡顿，在时间上面加一个随机值，使得过期时间分散一些。</li>
+<li>Redis 持久化<br><a target="_blank" rel="noopener" href="http://oldblog.antirez.com/post/redis-persistence-demystified.html">http://oldblog.antirez.com/post/redis-persistence-demystified.html</a><br>持久化方式：<br>RDB 指定间隔时间的某个时间点的快照。<br>AOF 持久化操作日志。当 redis 重启的时候，需要根据 AOF 的 log 文件来重构数据。AOF 日志文件是redis 的自定义格式。当 AOF文件太大，redis 会重写该日志文件，减少命令数，但是结果一致。比如多次累加一个 key 100次。aof 就会有100条语句，BGREWRITEAOF会精简命令。<br>可以禁用 redis 的持久化，只要我们想让我们的数据只在 redis 运行时存在。<br>可以同时使用 AOF 和 RDB 来持久化 redis 中的数据。需要注意的是，此时，Redis 重启时，AOF 的日志文件会被用来重构 redis 中的数据，以此来保证数据的完整性。<br>RDB 做全量持久化，AOF 做增量持久化。RDB 每次消耗的时间长，down 机时，会丢失两次持久化之间的数据。所以，需要配合 AOF 来使用。Redis 重启时，先用 RDB 持久化的文件重构内存，然后使用 AOF 回放最近的操作指令来实现完整恢复重启之前的状态。<br>对于突然断电的结果，取决于 AOF 刷新日志到磁盘的时间间隔 sync。建议是 1s 刷新一次。<br>RDB 的原理，就是 fork &amp; COW. fork 过后，子进程和父进程共享数据段，此时，可以看做没有占用额外的内存开销。当父进程的数据有修改时，才会复制一份到子进程保存。所以，只有在极限情况，所有的父进程数据有修改，及其的物理内存使用率才会是 50%。<br>RDB 的优点是重启快，缺点是会丢失数据，备份一次的时间长。AOF 的优点是可以做到不丢失数据或者丢失很少的数据，但是重启很慢，因为需要重新根据日志来构建 redis 数据。所以往往是 RDB 和 AOF 搭配使用。</li>
+<li>Pipline<br>Pipline 的好处是可以将多次 IO 减少为 1次。前提是这些之类之间没有因果相关性</li>
+<li>Redis 的同步机制<br>Redis 可以使用主从同步，从从同步。<br>启动时，做第一次同步，主节点做一次 rdb，同时将后续修改操作放入 buffer,待 rdb 完成后。将 rdb 文件全量同步到 从节点，从节点接受完成后讲 rdb 镜像加载到内存。加载完成后，再通知主节点讲期间修改的 缓存 buffer 发送过来。<br>以上是第一次启动时候的同步，当机器都启动完成后，后面通过 AOF 做同步就是近乎实时。</li>
+<li>Redis 集群<br>Redis-sentinal 是着眼于高可用性。在 master down 机时，能在 slave 中选举一个新的 master，继续提供服务。<br>Redis-cluster 着眼于扩展性，在单个redis内存不足时，使用Cluster进行分片存储。</li>
+</ol>
+<p>redis 集群的 键分布模型，</p>
+<p>采用的 一种 hash slot(hash槽) 的 sharding 方式，而不是一致性 hash<br>Redis 集群的键空间被分割为 16384 个槽（slot）， 集群的最大节点数量也是 16384 个,推荐的最大节点数量为 1000 个左右。<br>每个主节点都负责处理 16384 个槽中的一部分。<br>使用公式 CRC16(key) % 16384 来计算键 key 属于哪个槽<br>删除某个节点：只需要将删除的节点中的槽移动到其它的节点，然后再移除空白槽需要删除的节点。<br>增加一个节点：只需要将当前所有节点中的某些槽移动到新的节点。<br>因为将一个 hash 槽从一个节点移动到另一个节点，不会造成节点堵塞，所以无论是添加还是移除已经存在的节点，又或者改变某个节点包含的 hash 槽数，不会造成集群下线。</p>
+<p>Redis 集群不保证数据的强一致性（strong consistency）： 在特定条件下， Redis 集群可能会丢失已经被执行过的写命令。</p>
+<ol start="10">
+<li>Redis 集群搭建</li>
+</ol>
 
                 
             </div>
@@ -668,7 +548,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://wangtianyu-ui.github.io/2020/10/02/Mysql%E9%AB%98%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E8%A7%84%E8%8C%83%E5%BB%BA%E8%AE%AE/">https://wangtianyu-ui.github.io/2020/10/02/Mysql%E9%AB%98%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E8%A7%84%E8%8C%83%E5%BB%BA%E8%AE%AE/</a>
+                    <a href="https://wangtianyu-ui.github.io/2020/10/05/Redis%E7%9F%A5%E8%AF%86%E7%82%B9%E6%95%B4%E7%90%86/">https://wangtianyu-ui.github.io/2020/10/05/Redis%E7%9F%A5%E8%AF%86%E7%82%B9%E6%95%B4%E7%90%86/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -706,8 +586,8 @@
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/Mysql/">
-                                    <span class="chip bg-color">Mysql</span>
+                                <a href="/tags/Redis/">
+                                    <span class="chip bg-color">Redis</span>
                                 </a>
                             
                         </div>
@@ -883,13 +763,13 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2020/10/05/Redis%E7%9F%A5%E8%AF%86%E7%82%B9%E6%95%B4%E7%90%86/">
+                <a href="/2020/11/12/Dubbo%E5%85%A5%E9%97%A8/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/17.jpg" class="responsive-img" alt="Redis知识点整理">
+                        <img src="/medias/featureimages/7.jpg" class="responsive-img" alt="Dubbo入门">
                         
-                        <span class="card-title">Redis知识点整理</span>
+                        <span class="card-title">Dubbo入门</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -900,14 +780,14 @@
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2020-10-05
+                            <i class="far fa-clock fa-fw icon-date"></i>2020-11-12
                         </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Redis/" class="post-category">
-                                    Redis
+                            <a href="/categories/Dubbo/" class="post-category">
+                                    Dubbo
                                 </a>
                             
                             
@@ -917,8 +797,8 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Redis/">
-                        <span class="chip bg-color">Redis</span>
+                    <a href="/tags/Dubbo/">
+                        <span class="chip bg-color">Dubbo</span>
                     </a>
                     
                 </div>
@@ -932,13 +812,13 @@
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2020/10/01/Voliate%E5%85%B3%E9%94%AE%E5%AD%97/">
+                <a href="/2020/10/02/Mysql%E9%AB%98%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96%E8%A7%84%E8%8C%83%E5%BB%BA%E8%AE%AE/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/16.jpg" class="responsive-img" alt="Voliate关键字">
+                        <img src="/medias/featureimages/19.jpg" class="responsive-img" alt="Mysql高性能优化规范建议">
                         
-                        <span class="card-title">Voliate关键字</span>
+                        <span class="card-title">Mysql高性能优化规范建议</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -949,14 +829,14 @@
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2020-10-01
+                                <i class="far fa-clock fa-fw icon-date"></i>2020-10-02
                             </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/%E5%B9%B6%E5%8F%91/" class="post-category">
-                                    并发
+                            <a href="/categories/Mysql/" class="post-category">
+                                    Mysql
                                 </a>
                             
                             
@@ -966,8 +846,8 @@
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/%E5%B9%B6%E5%8F%91/">
-                        <span class="chip bg-color">并发</span>
+                    <a href="/tags/Mysql/">
+                        <span class="chip bg-color">Mysql</span>
                     </a>
                     
                 </div>
