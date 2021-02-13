@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="Dubbo入门, 王添俞的博客">
+    <meta name="keywords" content="MySQL索引, 王添俞的博客">
     <meta name="description" content="">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>Dubbo入门 | 王添俞的博客</title>
+    <title>MySQL索引 | 王添俞的博客</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -310,12 +310,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/7.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/3.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">Dubbo入门</h1>
+                    <h1 class="description center-align post-title">MySQL索引</h1>
                 </div>
             </div>
         </div>
@@ -431,8 +431,8 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/Dubbo/">
-                                <span class="chip bg-color">Dubbo</span>
+                            <a href="/tags/Mysql/">
+                                <span class="chip bg-color">Mysql</span>
                             </a>
                         
                     </div>
@@ -443,8 +443,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Dubbo/" class="post-category">
-                                Dubbo
+                            <a href="/categories/Mysql/" class="post-category">
+                                Mysql
                             </a>
                         
                     </div>
@@ -456,7 +456,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2020-11-12
+                    2020-12-10
                 </div>
                 
 
@@ -477,157 +477,212 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <p>###一 重要的概念<br>####1.1 什么是 Dubbo?<br>Apache Dubbo (incubating) |ˈdʌbəʊ| 是一款高性能、轻量级的开源Java RPC 框架，它提供了三大核心能力：面向接口的远程方法调用，智能容错和负载均衡，以及服务自动注册和发现。简单来说 Dubbo 是一个分布式服务框架，致力于提供高性能和透明化的RPC远程服务调用方案，以及SOA服务治理方案。</p>
-<p>Dubbo 目前已经有接近 23k 的 Star ，Dubbo的Github 地址：<a target="_blank" rel="noopener" href="https://github.com/apache/incubator-dubbo">https://github.com/apache/incubator-dubbo</a> 。 另外，在开源中国举行的2018年度最受欢迎中国开源软件这个活动的评选中，Dubbo 更是凭借其超高人气仅次于 vue.js 和 ECharts 获得第三名的好成绩。</p>
-<p>Dubbo 是由阿里开源，后来加入了 Apache 。正式由于 Dubbo 的出现，才使得越来越多的公司开始使用以及接受分布式架构。</p>
-<p><strong>我们上面说了 Dubbo 实际上是 RPC 框架，那么什么是 RPC呢？</strong></p>
-<h4 id="1-2-什么是-RPC-RPC原理是什么"><a href="#1-2-什么是-RPC-RPC原理是什么" class="headerlink" title="1.2 什么是 RPC?RPC原理是什么?"></a>1.2 什么是 RPC?RPC原理是什么?</h4><p><strong>什么是 RPC？</strong></p>
-<p>RPC（Remote Procedure Call）—远程过程调用，它是一种通过网络从远程计算机程序上请求服务，而不需要了解底层网络技术的协议。比如两个不同的服务 A、B 部署在两台不同的机器上，那么服务 A 如果想要调用服务 B 中的某个方法该怎么办呢？使用 HTTP请求当然可以，但是可能会比较麻烦。 RPC 的出现就是为了让你调用远程方法像调用本地方法一样简单。</p>
-<p><strong>RPC原理是什么？</strong></p>
-<p>我这里这是简单的提一下。详细内容可以查看下面这篇文章：<br><a target="_blank" rel="noopener" href="http://www.importnew.com/22003.html">http://www.importnew.com/22003.html</a></p>
-<p><img src="https://img-blog.csdnimg.cn/img_convert/3e77032251e377a75918a7d099a8cba6.png" alt="avatar"></p>
-<ol>
-<li>服务消费方（client）调用以本地调用方式调用服务；</li>
-<li>client stub接收到调用后负责将方法、参数等组装成能够进行网络传输的消息体；</li>
-<li>client stub找到服务地址，并将消息发送到服务端；</li>
-<li>server stub收到消息后进行解码；</li>
-<li>server stub根据解码结果调用本地的服务；</li>
-<li>本地服务执行并将结果返回给server stub；</li>
-<li>server stub将返回结果打包成消息并发送至消费方；</li>
-<li>client stub接收到消息，并进行解码；</li>
-<li>服务消费方得到最终结果。</li>
-</ol>
-<p>下面再贴一个网上的时序图：<br><img src="https://img-blog.csdnimg.cn/img_convert/ba1c80f88f2c46cfaa7f69368c890a68.png" alt="avatar"></p>
-<p><strong>说了这么多，我们为什么要用 Dubbo 呢？</strong></p>
-<h4 id="1-3-为什么要用-Dubbo"><a href="#1-3-为什么要用-Dubbo" class="headerlink" title="1.3 为什么要用 Dubbo?"></a>1.3 为什么要用 Dubbo?</h4><p>Dubbo 的诞生和 SOA 分布式架构的流行有着莫大的关系。SOA 面向服务的架构（Service Oriented Architecture），也就是把工程按照业务逻辑拆分成服务层、表现层两个工程。服务层中包含业务逻辑，只需要对外提供服务即可。表现层只需要处理和页面的交互，业务逻辑都是调用服务层的服务来实现。SOA架构中有两个主要角色：服务提供者（Provider）和服务使用者（Consumer）。</p>
-<p><img src="https://img-blog.csdnimg.cn/img_convert/8a3cd482f38e8329ae71b344feeb2d29.png" alt="avatar"></p>
-<p><strong>如果你要开发分布式程序，你也可以直接基于 HTTP 接口进行通信，但是为什么要用 Dubbo呢？</strong></p>
-<p>我觉得主要可以从 Dubbo 提供的下面四点特性来说为什么要用 Dubbo：</p>
-<ol>
-<li>负载均衡——同一个服务部署在不同的机器时该调用那一台机器上的服务。</li>
-<li>服务调用链路生成——随着系统的发展，服务越来越多，服务间依赖关系变得错踪复杂，甚至分不清哪个应用要在哪个应用之前启动，架构师都不能完整的描述应用的架构关系。Dubbo 可以为我们解决服务之间互相是如何调用的。</li>
-<li>服务访问压力以及时长统计、资源调度和治理——基于访问压力实时管理集群容量，提高集群利用率。</li>
-<li>服务降级——某个服务挂掉之后调用备用服务。</li>
-</ol>
-<p>另外，Dubbo 除了能够应用在分布式系统中，也可以应用在现在比较火的微服务系统中。不过，由于 Spring Cloud 在微服务中应用更加广泛，所以，我觉得一般我们提 Dubbo 的话，大部分是分布式系统的情况。</p>
-<p><strong>我们刚刚提到了分布式这个概念，下面再给大家介绍一下什么是分布式？为什么要分布式？</strong></p>
-<h4 id="1-4-什么是分布式"><a href="#1-4-什么是分布式" class="headerlink" title="1.4 什么是分布式?"></a>1.4 什么是分布式?</h4><p>分布式或者说 SOA 分布式重要的就是面向服务，说简单的分布式就是我们把整个系统拆分成不同的服务然后将这些服务放在不同的服务器上减轻单体服务的压力提高并发量和性能。比如电商系统可以简单地拆分成订单系统、商品系统、登录系统等等，拆分之后的每个服务可以部署在不同的机器上，如果某一个服务的访问量比较大的话也可以将这个服务同时部署在多台机器上。</p>
-<h4 id="1-5-为什么要分布式"><a href="#1-5-为什么要分布式" class="headerlink" title="1.5 为什么要分布式?"></a>1.5 为什么要分布式?</h4><p>从开发角度来讲单体应用的代码都集中在一起，而分布式系统的代码根据业务被拆分。所以，每个团队可以负责一个服务的开发，这样提升了开发效率。另外，代码根据业务拆分之后更加便于维护和扩展。</p>
-<p>另外，我觉得将系统拆分成分布式之后不光便于系统扩展和维护，更能提高整个系统的性能。你想一想嘛？把整个系统拆分成不同的服务/系统，然后每个服务/系统 单独部署在一台服务器上，是不是很大程度上提高了系统性能呢？</p>
-<p>###二 Dubbo 的架构<br>2.1 Dubbo 的架构图解</p>
-<p><img src="https://img-blog.csdnimg.cn/img_convert/7ea57c27be635128648f43c6a46ffd10.png" alt="avatar"></p>
-<p><strong>上述节点简单说明：</strong></p>
+                <h3 id="MySQL-索引"><a href="#MySQL-索引" class="headerlink" title="MySQL 索引"></a>MySQL 索引</h3><p>数据库索引的原理：数据库索引，是数据库管理系统中一个排序的数据结构，以协助快速查询、更新数据库表中数据。索引的实现通常使用 BTree 及其变种 B+Tree。</p>
+<p>本文从如何建立 MySQL 索引以及介绍 MySQL 的索引类型，再讲 MySQL 索引的利与弊，以及建立索引时需要注意的地方。</p>
+<p>首先:先假设有一张表,表的数据有 10W 条数据,其中有一条数据是 nickname=’css’ ,如果要拿这条数据的话需要些的 sql 是</p>
+<pre><code> SELECT * FROM award WHERE nickname = &#39;css&#39;;
+</code></pre>
+<p>一般情况下,在没有建立索引的时候, mysql 需要扫描全表及扫描 10W 条数据找这条数据,如果我在 nickname 上建立索引,那么mysql只需要扫描一行数据及为我们找到这条 nickname=’css’ 的数据,是不是感觉性能提升了好多咧….</p>
+<p>mysql 的索引分为 单例索引（主键索引、唯一索引、普通索引）和 组合索引。</p>
 <ul>
-<li>Provider： 暴露服务的服务提供方</li>
-<li>Consumer： 调用远程服务的服务消费方</li>
-<li>Registry： 服务注册与发现的注册中心</li>
-<li>Monitor： 统计服务的调用次数和调用时间的监控中心</li>
-<li>Container： 服务运行容器</li>
+<li><p>单例索引：一个索引只包含一个列，一个表可以有多个单例索引。</p>
+</li>
+<li><p>组合索引：一个组合索引包含两个或两个以上的列。<br>本文使用的案例的表：</p>
+<pre><code> CREATE TABLE `award` (
+   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT &#39;用户id&#39;,
+   `aty_id` varchar(100) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;活动场景id&#39;,
+   `nickname` varchar(12) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;用户昵称&#39;,
+   `is_awarded` tinyint(1) NOT NULL DEFAULT 0 COMMENT &#39;用户是否领奖&#39;,
+   `award_time` int(11) NOT NULL DEFAULT 0 COMMENT &#39;领奖时间&#39;,
+   `account` varchar(12) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;帐号&#39;,
+   `password` char(32) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;密码&#39;,
+   `message` varchar(255) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;获奖信息&#39;,
+   `created_time` int(11) NOT NULL DEFAULT 0 COMMENT &#39;创建时间&#39;,
+   `updated_time` int(11) NOT NULL DEFAULT 0 COMMENT &#39;更新时间&#39;,
+   PRIMARY KEY (`id`)
+ ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT=&#39;获奖信息表&#39;;
+ 
+INSERT INTO `award` (`nickname`, `account`, `message`, `created_time`)
+VALUES (&#39;rSUQFzpkDz3R&#39;, &#39;DYxJoqZq2rd7&#39;, &#39;aaabbbccccxuxuxuxuuxux&#39;, 1449567822);```
+</code></pre>
+</li>
 </ul>
-<p>调用关系说明：</p>
-<ol>
-<li>服务容器负责启动，加载，运行服务提供者。</li>
-<li>服务提供者在启动时，向注册中心注册自己提供的服务。</li>
-<li>服务消费者在启动时，向注册中心订阅自己所需的服务。</li>
-<li>注册中心返回服务提供者地址列表给消费者，如果有变更，注册中心将基于长连接推送变更数据给消费者。</li>
-<li>服务消费者，从提供者地址列表中，基于软负载均衡算法，选一台提供者进行调用，如果调用失败，再选另一台调用。</li>
-<li>服务消费者和提供者，在内存中累计调用次数和调用时间，定时每分钟发送一次统计数据到监控中心。</li>
+<h4 id="一-索引的创建"><a href="#一-索引的创建" class="headerlink" title="(一) 索引的创建"></a>(一) 索引的创建</h4><ol>
+<li>单例索引</li>
 </ol>
-<p><strong>重要知识点总结：</strong></p>
-<ul>
-<li>注册中心负责服务地址的注册与查找，相当于目录服务，服务提供者和消费者只在启动时与注册中心交互，注册中心不转发请求，压力较小</li>
-<li>监控中心负责统计各服务调用次数，调用时间等，统计先在内存汇总后每分钟一次发送到监控中心服务器，并以报表展示</li>
-<li>注册中心，服务提供者，服务消费者三者之间均为长连接，监控中心除外</li>
-<li>注册中心通过长连接感知服务提供者的存在，服务提供者宕机，注册中心将立即推送事件通知消费者</li>
-<li>注册中心和监控中心全部宕机，不影响已运行的提供者和消费者，消费者在本地缓存了提供者列表</li>
-<li>注册中心和监控中心都是可选的，服务消费者可以直连服务提供者</li>
-<li>服务提供者无状态，任意一台宕掉后，不影响使用</li>
-<li>服务提供者全部宕掉后，服务消费者应用将无法使用，并无限次重连等待服务提供者恢复</li>
-</ul>
-<h4 id="2-2-Dubbo-工作原理"><a href="#2-2-Dubbo-工作原理" class="headerlink" title="2.2 Dubbo 工作原理"></a>2.2 Dubbo 工作原理</h4><p><img src="https://img-blog.csdnimg.cn/img_convert/dca61bbc55e64f1f4f509197d0b577fa.png" alt="avatar"></p>
-<p>图中从下至上分为十层，各层均为单向依赖，右边的黑色箭头代表层之间的依赖关系，每一层都可以剥离上层被复用，其中，Service 和 Config 层为 API，其它各层均为 SPI。</p>
-<p><strong>各层说明：</strong></p>
-<ul>
-<li>第一层：service层，接口层，给服务提供者和消费者来实现的</li>
-<li>第二层：config层，配置层，主要是对dubbo进行各种配置的</li>
-<li>第三层：proxy层，服务接口透明代理，生成服务的客户端 Stub 和服务器端 Skeleton</li>
-<li>第四层：registry层，服务注册层，负责服务的注册与发现</li>
-<li>第五层：cluster层，集群层，封装多个服务提供者的路由以及负载均衡，将多个实例组合成一个服务</li>
-<li>第六层：monitor层，监控层，对rpc接口的调用次数和调用时间进行监控</li>
-<li>第七层：protocol层，远程调用层，封装rpc调用</li>
-<li>第八层：exchange层，信息交换层，封装请求响应模式，同步转异步</li>
-<li>第九层：transport层，网络传输层，抽象mina和netty为统一接口</li>
-<li>第十层：serialize层，数据序列化层，网络传输需要</li>
-</ul>
-<p>###三 Dubbo 的负载均衡策略<br>####3.1 先来解释一下什么是负载均衡<br><strong>先来个官方的解释。</strong></p>
-<p>维基百科对负载均衡的定义：负载均衡改善了跨多个计算资源（例如计算机，计算机集群，网络链接，中央处理单元或磁盘驱动的的工作负载分布。负载平衡旨在优化资源使用，最大化吞吐量，最小化响应时间，并避免任何单个资源的过载。使用具有负载平衡而不是单个组件的多个组件可以通过冗余提高可靠性和可用性。负载平衡通常涉及专用软件或硬件。</p>
-<p><strong>上面讲的大家可能不太好理解，再用通俗的话给大家说一下。</strong></p>
-<p>比如我们的系统中的某个服务的访问量特别大，我们将这个服务部署在了多台服务器上，当客户端发起请求的时候，多台服务器都可以处理这个请求。那么，如何正确选择处理该请求的服务器就很关键。假如，你就要一台服务器来处理该服务的请求，那该服务部署在多台服务器的意义就不复存在了。负载均衡就是为了避免单个服务器响应同一请求，容易造成服务器宕机、崩溃等问题，我们从负载均衡的这四个字就能明显感受到它的意义。</p>
-<p>####3.2 再来看看 Dubbo 提供的负载均衡策略<br>在集群负载均衡时，Dubbo 提供了多种均衡策略，默认为 random 随机调用。可以自行扩展负载均衡策略，参见：负载均衡扩展。</p>
-<p>备注:下面的图片来自于：尚硅谷2018Dubbo 视频。</p>
-<p>#####3.2.1 Random LoadBalance(默认，基于权重的随机负载均衡机制)</p>
-<ul>
-<li>随机，按权重设置随机概率。</li>
-<li>在一个截面上碰撞的概率高，但调用量越大分布越均匀，而且按概率使用权重后也比较均匀，有利于动态调整提供者权重。</li>
-</ul>
-<p><img src="https://img-blog.csdnimg.cn/img_convert/bc5644e81dbd796308b9211e840db6c4.png" alt="avatar"></p>
-<h5 id="3-2-2-RoundRobin-LoadBalance-不推荐，基于权重的轮询负载均衡机制"><a href="#3-2-2-RoundRobin-LoadBalance-不推荐，基于权重的轮询负载均衡机制" class="headerlink" title="3.2.2 RoundRobin LoadBalance(不推荐，基于权重的轮询负载均衡机制)"></a>3.2.2 RoundRobin LoadBalance(不推荐，基于权重的轮询负载均衡机制)</h5><ul>
-<li>轮循，按公约后的权重设置轮循比率。</li>
-<li>存在慢的提供者累积请求的问题，比如：第二台机器很慢，但没挂，当请求调到第二台时就卡在那，久而久之，所有请求都卡在调到第二台上。</li>
-</ul>
-<p><img src="https://img-blog.csdnimg.cn/img_convert/9164315370b4b8ae99003a47a522bccf.png" alt="avatar"></p>
-<h5 id="3-2-3-LeastActive-LoadBalance"><a href="#3-2-3-LeastActive-LoadBalance" class="headerlink" title="3.2.3 LeastActive LoadBalance"></a>3.2.3 LeastActive LoadBalance</h5><ul>
-<li>最少活跃调用数，相同活跃数的随机，活跃数指调用前后计数差。</li>
-<li>使慢的提供者收到更少请求，因为越慢的提供者的调用前后计数差会越大。</li>
-</ul>
-<h5 id="3-2-4-ConsistentHash-LoadBalance"><a href="#3-2-4-ConsistentHash-LoadBalance" class="headerlink" title="3.2.4 ConsistentHash LoadBalance"></a>3.2.4 ConsistentHash LoadBalance</h5><ul>
-<li>一致性 Hash，相同参数的请求总是发到同一提供者。(如果你需要的不是随机负载均衡，是要一类请求都到一个节点，那就走这个一致性hash策略。)</li>
-<li>当某一台提供者挂时，原本发往该提供者的请求，基于虚拟节点，平摊到其它提供者，不会引起剧烈变动。</li>
-<li>算法参见：<a target="_blank" rel="noopener" href="http://en.wikipedia.org/wiki/Consistent_hashing">http://en.wikipedia.org/wiki/Consistent_hashing</a></li>
-<li>缺省只对第一个参数 Hash，如果要修改，请配置 <code>&lt;dubbo:parameter key=&quot;hash.arguments&quot; value=&quot;0,1&quot; /&gt;</code></li>
-<li>缺省用 160 份虚拟节点，如果要修改，请配置 `&lt;dubbo:parameter key=”hash.nodes” value=”320” /&gt;</li>
-</ul>
-<h5 id="3-3-配置方式"><a href="#3-3-配置方式" class="headerlink" title="3.3 配置方式"></a>3.3 配置方式</h5><p><strong>xml 配置方式</strong></p>
-<p>服务端服务级别</p>
-<pre><code>&lt;dubbo:service interface=&quot;...&quot; loadbalance=&quot;roundrobin&quot; /&gt;
+<p>1.1）普通索引，这个是最基本的索引。</p>
+<p>其 sql 格式是 :</p>
+<pre><code> CREATE INDEX IndexName ON `TableName`(`字段名`(length));
+# 或者
+ALTER TABLE TableName ADD INDEX IndexName(`字段名`(length));
 </code></pre>
-<p>客户端服务级别</p>
-<pre><code>&lt;dubbo:reference interface=&quot;...&quot; loadbalance=&quot;roundrobin&quot; /&gt;
+<p>第一种方式：</p>
+<pre><code>CREATE INDEX account_Index ON `award`(`account`);
 </code></pre>
-<p>服务端方法级别</p>
-<pre><code>   &lt;dubbo:service interface=&quot;...&quot;&gt;
-     &lt;dubbo:method name=&quot;...&quot; loadbalance=&quot;roundrobin&quot;/&gt;
-&lt;/dubbo:service&gt;
+<p>第二种方式：</p>
+<pre><code>ALTER TABLE award ADD INDEX account_Index(`account`);
 </code></pre>
-<p>客户端方法级别</p>
-<pre><code>&lt;dubbo:reference interface=&quot;...&quot;&gt;
-   &lt;dubbo:method name=&quot;...&quot; loadbalance=&quot;roundrobin&quot;/&gt;
-&lt;/dubbo:reference&gt;
+<p>如果是 CHAR , VARCHAR 类型, length 可以小于字段的实际长度,如果是BLOB和TEXT类型就必须指定长度。</p>
+<p>1.2）唯一索引，与普通索引类似，但是不同的是唯一索引要求所有的列的值是唯一的，这一点和主键索引一样，但是它允许有空值。</p>
+<p>其 sql 格式是：</p>
+<pre><code>CREATE UNIQUE INDEX IndexName ON `TableName`(`字段名`(length));
+# 或者
+ALTER TABLE TableName ADD UNIQUE (column_list); 
 </code></pre>
-<p><strong>注解配置方式：</strong></p>
-<p>消费方基于基于注解的服务级别配置方式：</p>
-<pre><code>@Reference(loadbalance = &quot;roundrobin&quot;)
-HelloService helloService;
+<p>第一种方式</p>
+<pre><code>CREATE UNIQUE INDEX account_UNIQUE_Index ON `award`(`account`);
 </code></pre>
-<h3 id="四-zookeeper宕机与dubbo直连的情况"><a href="#四-zookeeper宕机与dubbo直连的情况" class="headerlink" title="四 zookeeper宕机与dubbo直连的情况"></a>四 zookeeper宕机与dubbo直连的情况</h3><p>zookeeper宕机与dubbo直连的情况在面试中可能会被经常问到，所以要引起重视。</p>
-<p>在实际生产中，假如zookeeper注册中心宕掉，一段时间内服务消费方还是能够调用提供方的服务的，实际上它使用的本地缓存进行通讯，这只是dubbo健壮性的一种体现。</p>
-<p><strong>dubbo的健壮性表现：</strong></p>
-<ol>
-<li>监控中心宕掉不影响使用，只是丢失部分采样数据</li>
-<li>数据库宕掉后，注册中心仍能通过缓存提供服务列表查询，但不能注册新服务</li>
-<li>注册中心对等集群，任意一台宕掉后，将自动切换到另一台</li>
-<li>注册中心全部宕掉后，服务提供者和服务消费者仍能通过本地缓存通讯</li>
-<li>服务提供者无状态，任意一台宕掉后，不影响使用</li>
-<li>服务提供者全部宕掉后，服务消费者应用将无法使用，并无限次重连等待服务提供者恢复</li>
+<p>1.3）主键索引，不允许有空值,（在 B+Tree 中的 InnoDB 引擎中，主键索引起到了至关重要的位置）</p>
+<p>主键索引建立的规则是 int 优于 varchar，一般在建表的时候创建，最好是与表的其他字段不相关的列或者是业务不相关的列。一般会设为 int 而且是 AUTO_INCREMENT 自增类型的。</p>
+<ol start="2">
+<li>组合索引</li>
 </ol>
-<p>我们前面提到过：注册中心负责服务地址的注册与查找，相当于目录服务，服务提供者和消费者只在启动时与注册中心交互，注册中心不转发请求，压力较小。所以，我们可以完全可以绕过注册中心——采用 dubbo 直连 ，即在服务消费方配置服务提供方的位置信息。</p>
-<p><strong>xml配置方式：</strong></p>
-<pre><code>&lt;dubbo:reference id=&quot;userService&quot; interface=&quot;com.zang.gmall.service.UserService&quot; url=&quot;dubbo://localhost:20880&quot; /&gt;
+<p>一个表中含有多个单例索引不代表是组合索引，通俗一点讲，组合索引是：包含多个字段但是只有索引名称。</p>
+<p>其 sql 格式是：</p>
+<pre><code>CREATE INDEX nickname_account_createdTime_Index ON `award`(`nickname`, `account`, `created_time`);
 </code></pre>
-<p><strong>注解方式：</strong></p>
-<pre><code> @Reference(url = &quot;127.0.0.1:20880&quot;)   
- HelloService helloService;
+<p><img src="https://upload-images.jianshu.io/upload_images/5114528-706c6315f0abee2e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1200/format/webp" alt="avatar"></p>
+<p>如果你建立了组合索引 (nickname_account_createdTime_Index)，那么它实际包含的是 3 个索引 (nickname) (nickname,account)(nickname,account,created_time)</p>
+<p>在使用查询的时候遵循 mysql 组合索引的 “最左前缀”，即索引 where 时的条件要按照建立索引的时候字段的排列方式。</p>
+<p>1、不按索引最左列开始查询（多列索引） 例如</p>
+<pre><code> index(‘c1’, ‘c2’, ‘c3’) where c2 = &#39;aaa&#39; # 不使用索引
+ where c2 = &#39;aaa&#39; and c3=&#39;sss&#39; # 不能使用索引
 </code></pre>
+<p>2、查询某个列有范围查询，则其右边的所有列都无法使用查询（多列查询）</p>
+<pre><code>Where c1= &#39;xxx&#39; and c2 like &#39;aa%&#39; and c3=&#39;sss&#39;
+# 该查询只会使用索引中的前两列,因为like是范围查询
+</code></pre>
+<p>3、不能跳过某个字段来进行查询，这样利用不到索引，比如：</p>
+<pre><code>EXPLAIN SELECT * FROM `award` WHERE nickname &gt; &#39;rSUQFzpkDz3R&#39; AND account = &#39;DYxJoqZq2rd7&#39; AND created_time = 1449567822; 
+</code></pre>
+<p>因为我的索引是 (nickname, account, created_time)，如果第一个字段出现 范围符号 的查找，那么将不会用到索引，如果我是第二个或者第三个字段使用范围符号的查找，那么它会利用索引，利用的索引是 (nickname)，因为上面说了建立组合索引 (nickname, account, created_time)，会出现三个索引。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5114528-e89fefe045067907.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1200/format/webp" alt="avatar"></p>
+<p>注：使用组合检索的时候可能需要把前面创建的单例检索删除，否则可能会使用单例检索</p>
+<p>3.全文索引</p>
+<p>文本字段上（text）如果建立的是普通索引，那么只有对文本的字段内容前面的字符进行索引，其字符大小根据索引建立索引时声明的大小来规定。</p>
+<p>如果文本中出现多个一样的字符，而且需要查找的话，那么其条件只能是 where column like ‘%xxxx%’， 这样做会让索引失效</p>
+<p>这个时候全文索引就有作用了</p>
+<pre><code>ALTER TABLE TableName ADD FULLTEXT(column1, column2);
+
+ALTER TABLE `award` ADD FULLTEXT(`message`);
+</code></pre>
+<p>ALTER TABLE <code>award</code> ADD FULLTEXT(<code>message</code>);<br>有了全文索引，就可以用 SELECT 查询命令去检索那些包含着一个或多个给定单词的数据记录了。</p>
+<pre><code>SELECT * FROM TableName WHERE MATCH(column1, column2) AGAINST(&#39;xxx&#39;, &#39;sss&#39;, &#39;ddd&#39;);
+
+SELECT * FROM TableName WHERE MATCH(column1, column2) AGAINST(&#39;xxx&#39;, &#39;sss&#39;, &#39;ddd&#39;);
+</code></pre>
+<p><img src="https://upload-images.jianshu.io/upload_images/5114528-1940bc1006952c47.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1200/format/webp" alt="avatar"></p>
+<h3 id="使用索引的优点"><a href="#使用索引的优点" class="headerlink" title="使用索引的优点"></a>使用索引的优点</h3><p>1）可以通过建立唯一索引或者主键索引，保证数据库表中每一行数据的唯一性</p>
+<p>2）建立索引可以大大提高检索的数据，以及减少表的检索行数</p>
+<p>3）在表连接的连接条件，可以加速表与表直接的相连</p>
+<p>4）在分组和排序字句进行数据检索，可以减少查询时间中 分组 和 排序 所消耗的时间（数据库的记录会重新排序）</p>
+<p>5）建立索引，在查询中使用索引，可以提高性能</p>
+<h3 id="使用索引的缺点"><a href="#使用索引的缺点" class="headerlink" title="使用索引的缺点"></a>使用索引的缺点</h3><p>1）创建索引和维护索引会消耗时间，随着数据量的增加而增加</p>
+<p>2）索引文件会占用物理空间，除了数据表需要占用物理空间之外，每一个索引还会占用一定的物理空间</p>
+<p>3）当对表的数据进行 INSERT,UPDATE,DELETE 的时候,索引也要动态的维护,这样就会降低数据的维护速度,(建立索引会占用磁盘空间的索引文件。一般情况这个问题不太严重，但如果你在一个大表上创建了多种组合索引，索引文件的会膨胀很快)。</p>
+<h3 id="五-使用索引需要注意的地方"><a href="#五-使用索引需要注意的地方" class="headerlink" title="(五) 使用索引需要注意的地方"></a>(五) 使用索引需要注意的地方</h3><p>在建立索引的时候应该考虑索引该建立在数据库表中的某些列上，哪一些索引需要建立，哪一些索引是多余的，一般来说：</p>
+<p>1）在经常需要搜索的列上,可以加快索引的速度</p>
+<p>2）主键列上可以确保列的唯一性</p>
+<p>3）在表与表的连接条件上加上索引,可以加快连接查询的速度</p>
+<p>4）在经常需要排序 (order by) ,分组 (group by) 和的 distinct 列上加索引 可以加快排序查询的时间, (单独order by 用不了索引，索引考虑加where 或加limit)</p>
+<p>5）在一些 where 之后的 &lt; &lt;= &gt; &gt;= BETWEEN IN 以及某个情况下的like 建立字段的索引(B-TREE)</p>
+<p>6）like语句，前导模糊查询 like “%XXX” 不能使用索引，而非前导模糊查询 like “XXX%” 则可以</p>
+<p>7）索引不会包含 NULL 列,如果列中包含 NULL 值都将不会被包含在索引中,复合索引中如果有一列含有NULL值那么这个组合索引都将失效,一般需要给默认值0或者 ‘ ‘ 字符串</p>
+<p>8）使用短索引,如果你的一个字段是 Char(32) 或者 int(32) ,在创建索引的时候指定前缀长度 比如前10个字符 (前提是多数值是唯一的..)那么短索引可以提高查询速度,并且可以减少磁盘的空间,也可以减少I/0操作.</p>
+<p>9）不要在列上进行运算,这样会使得mysql索引失效,也会进行全表扫描</p>
+<p>10）选择越小的数据类型越好,因为通常越小的数据类型通常在磁盘,内存,cpu,缓存中 占用的空间很少,处理起来更快</p>
+<h3 id="六-什么情况下不创建索引"><a href="#六-什么情况下不创建索引" class="headerlink" title="(六) 什么情况下不创建索引"></a>(六) 什么情况下不创建索引</h3><p>1）查询中很少使用到的列不应该创建索引,如果建立了索引然而还会降低mysql的性能和增大了空间需求.</p>
+<p>2）很少数据的列也不应该建立索引,比如 一个性别字段 0或者1,在查询中,结果集的数据占了表中数据行的比例比较大,mysql需要扫描的行数很多,增加索引,并不能提高效率</p>
+<p>3）定义为 text 和 image 和 bit 数据类型的列不应该增加索引</p>
+<p>4）当表的修改(UPDATE,INSERT,DELETE)操作远远大于检索(SELECT)操作时不应该创建索引,这两个操作是互斥的关系</p>
+<h3 id="七-MySQL-优化之道"><a href="#七-MySQL-优化之道" class="headerlink" title="(七) MySQL 优化之道"></a>(七) MySQL 优化之道</h3><p>一些常见的 SQL 实践</p>
+<ul>
+<li><p>负向条件不能使用索引</p>
+<p>  select from order where status!=0 and status!=1</p>
+<p>  not in/not exists # 都不是好习惯</p>
+</li>
+</ul>
+<p>可以优化为 in 查询：<br>    select from order where status in(2,3)</p>
+<ul>
+<li><p>前导模糊查询不能使用索引</p>
+<p>  select from order where desc like ‘%XX’</p>
+</li>
+</ul>
+<p>而非前导模糊查询则可以：</p>
+<pre><code>select from order where desc like &#39;XX%&#39;
+</code></pre>
+<ul>
+<li><p>数据区分度不大的字段不宜使用索引</p>
+<p>  select from user where sex=1</p>
+</li>
+</ul>
+<p>原因：性别只有男，女，每次过滤掉的数据很少，不宜使用索引。</p>
+<p>经验上，能过滤80%数据时就可以使用索引。对于订单状态，如果状态值很少，不宜使用索引，如果状态值很多，能够过滤大量数据，则应该建立索引。</p>
+<ul>
+<li><p>在属性上进行计算不能命中索引</p>
+<p>  select from order_ where YEAR(date) &lt;= ‘2017’</p>
+</li>
+</ul>
+<p>即使 date 上建立了索引，也会全表扫描，可优化为值计算：</p>
+<pre><code>select from order_ where date &lt;= CURDATE()
+</code></pre>
+<p>或者：</p>
+<pre><code>select from order_ where date &lt; = &#39;2017-01-01&#39;
+</code></pre>
+<p>并非周知的 SQL 实践</p>
+<ul>
+<li><p>如果业务大部分是单条查询，使用 Hash 索引性能更好，例如用户中心</p>
+<p>  select from <code>user</code> where uid = ?<br>  select from user where login_name=?</p>
+</li>
+</ul>
+<p>原因：B-Tree索引的时间复杂度是 O(log(n))；Hash 索引的时间复杂度是 O(1)</p>
+<ul>
+<li>允许 null的列，查询有潜在大坑</li>
+</ul>
+<p>单列索引不存 null 值，复合索引不存全为 null 的值，如果列允许为 null，可能会得到“不符合预期”的结果集</p>
+<pre><code>select from user where name != &#39;shenjian&#39;
+</code></pre>
+<p>如果 name 允许为 null，索引不存储null值，结果集中不会包含这些记录。所以，请使用 not null 约束以及默认值。</p>
+<ul>
+<li>复合索引最左前缀，并不是指 SQL 语句的 where顺序要和符合索引一致。</li>
+</ul>
+<p>用户中心建立了 (login_name, password) 的符合索引</p>
+<pre><code>select from user where login_name=? and passwd=?
+select from user where passwd=? and login_name=?
+</code></pre>
+<p>都能够命中索引</p>
+<pre><code>select from user where login_name=?
+</code></pre>
+<p>也能命中索引，满足符合索引最左前缀</p>
+<pre><code>select from user where passwd=?
+</code></pre>
+<p>不能命中索引，不满足符合索引最左前缀。</p>
+<ul>
+<li>使用 ENUM 而不是字符串</li>
+</ul>
+<p>ENUM 保存的是 TINYINT，别在枚举中搞一些“中国”“北京”“技术部”这样的字符串，字符串空间又大，效率又低。</p>
+<p><strong>小众但有用的 SQL 实践</strong></p>
+<ul>
+<li><p>如果明确知道只有一条结果返回，limit 1 能够提高效率</p>
+<p>  select from user where login_name=?</p>
+</li>
+</ul>
+<p>可以优化为：</p>
+<p>select from user where login_name=? limit 1</p>
+<p>原因：你知道只有一条结果，但数据库并不知道，明确告诉它，让它主动停止游标移动</p>
+<ul>
+<li>把计算放到业务层而不是数据库层，除了节省数据的 CPU，还有意想不到的查询缓存优化效果</li>
+</ul>
+<pre><code>select from order where date &lt; = CURDATE()
+</code></pre>
+<p>这不是一个号的 SQL 实践，应该优化为：</p>
+<pre><code>$curDate = date(&#39;Y-m-d&#39;);
+$res = mysqlquery(&#39;select from order where date &lt; = $curDate&#39;);
+</code></pre>
+<p>原因：释放了数据库的 CPU，多次调用，传入的SQL相同，才可以利用查询缓存</p>
+<ul>
+<li>强制类型转换会全表扫描  select from user where phone=13800001234</li>
+</ul>
 
                 
             </div>
@@ -654,7 +709,7 @@ HelloService helloService;
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://wangtianyu-ui.github.io/2020/11/12/Dubbo%E5%85%A5%E9%97%A8/">https://wangtianyu-ui.github.io/2020/11/12/Dubbo%E5%85%A5%E9%97%A8/</a>
+                    <a href="https://wangtianyu-ui.github.io/2020/12/10/Mysql%E7%B4%A2%E5%BC%95/">https://wangtianyu-ui.github.io/2020/12/10/Mysql%E7%B4%A2%E5%BC%95/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -692,8 +747,8 @@ HelloService helloService;
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/Dubbo/">
-                                    <span class="chip bg-color">Dubbo</span>
+                                <a href="/tags/Mysql/">
+                                    <span class="chip bg-color">Mysql</span>
                                 </a>
                             
                         </div>
@@ -865,9 +920,10 @@ HelloService helloService;
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+                <i class="far fa-dot-circle"></i>&nbsp;本篇
+            </div>
             <div class="card">
                 <a href="/2020/12/10/Mysql%E7%B4%A2%E5%BC%95/">
                     <div class="card-image">
@@ -885,9 +941,9 @@ HelloService helloService;
                         
                     </div>
                     <div class="publish-info">
-                        <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2020-12-10
-                        </span>
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2020-12-10
+                            </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
@@ -900,6 +956,7 @@ HelloService helloService;
                         </span>
                     </div>
                 </div>
+
                 
                 <div class="card-action article-tags">
                     
@@ -918,13 +975,13 @@ HelloService helloService;
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2020/10/05/Redis%E7%9F%A5%E8%AF%86%E7%82%B9%E6%95%B4%E7%90%86/">
+                <a href="/2020/11/12/Dubbo%E5%85%A5%E9%97%A8/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/17.jpg" class="responsive-img" alt="Redis知识点整理">
+                        <img src="/medias/featureimages/7.jpg" class="responsive-img" alt="Dubbo入门">
                         
-                        <span class="card-title">Redis知识点整理</span>
+                        <span class="card-title">Dubbo入门</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -935,14 +992,14 @@ HelloService helloService;
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2020-10-05
+                                <i class="far fa-clock fa-fw icon-date"></i>2020-11-12
                             </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Redis/" class="post-category">
-                                    Redis
+                            <a href="/categories/Dubbo/" class="post-category">
+                                    Dubbo
                                 </a>
                             
                             
@@ -952,8 +1009,8 @@ HelloService helloService;
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Redis/">
-                        <span class="chip bg-color">Redis</span>
+                    <a href="/tags/Dubbo/">
+                        <span class="chip bg-color">Dubbo</span>
                     </a>
                     
                 </div>
