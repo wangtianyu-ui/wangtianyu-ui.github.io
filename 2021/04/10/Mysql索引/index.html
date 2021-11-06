@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="什么是AQS及其原理, 王添俞的博客">
+    <meta name="keywords" content="MySQL索引, 王添俞的博客">
     <meta name="description" content="">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>什么是AQS及其原理 | 王添俞的博客</title>
+    <title>MySQL索引 | 王添俞的博客</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -95,17 +95,6 @@
     
   </li>
   
-  <li class="hide-on-med-and-down nav-item">
-    
-    <a href="/contact" class="waves-effect waves-light">
-      
-      <i class="fas fa-comments" style="zoom: 0.6;"></i>
-      
-      <span>留言板</span>
-    </a>
-    
-  </li>
-  
   <li>
     <a href="#searchModal" class="modal-trigger waves-effect waves-light">
       <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
@@ -172,17 +161,6 @@
 			    <i class="fa-fw fas fa-archive"></i>
 			
 			归档
-		</a>
-          
-        </li>
-        
-        <li class="m-nav-item">
-	  
-		<a href="/contact" class="waves-effect waves-light">
-			
-			    <i class="fa-fw fas fa-comments"></i>
-			
-			留言板
 		</a>
           
         </li>
@@ -266,12 +244,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/7.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/3.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">什么是AQS及其原理</h1>
+                    <h1 class="description center-align post-title">MySQL索引</h1>
                 </div>
             </div>
         </div>
@@ -387,8 +365,8 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/%E5%B9%B6%E5%8F%91/">
-                                <span class="chip bg-color">并发</span>
+                            <a href="/tags/Mysql/">
+                                <span class="chip bg-color">Mysql</span>
                             </a>
                         
                     </div>
@@ -399,8 +377,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/%E5%B9%B6%E5%8F%91/" class="post-category">
-                                并发
+                            <a href="/categories/Mysql/" class="post-category">
+                                Mysql
                             </a>
                         
                     </div>
@@ -412,7 +390,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2020-09-12
+                    2021-04-10
                 </div>
                 
 
@@ -433,36 +411,212 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="1、AQS简介"><a href="#1、AQS简介" class="headerlink" title="1、AQS简介"></a>1、AQS简介</h3><p>AQS全名：AbstractQueuedSynchronizer，是并发容器J.U.C（java.lang.concurrent）下locks包内的一个类。它实现了一个FIFO(FirstIn、FisrtOut先进先出)的队列。底层实现的数据结构是一个双向链表。</p>
-<p><img src="https://www.pianshen.com/images/796/7cc7646e4fd1cb94f1cbf6e895725b94.png" alt="avatar"></p>
-<p>Sync queue：同步队列，是一个双向链表。包括head节点和tail节点。head节点主要用作后续的调度。 Condition queue：非必须，单向链表。当程序中存在cindition的时候才会存在此列表。</p>
-<p><strong>AQS核心思想是，如果被请求的共享资源空闲，则将当前请求资源的线程设置为有效的工作线程，并且将共享资源设置为锁定状态。如果被请求的共享资源被占用，那么就需要一套线程阻塞等待以及被唤醒时锁分配的机制，这个机制AQS是用CLH队列锁实现的，即将暂时获取不到锁的线程加入到队列中。</strong></p>
-<p><strong>AQS使用一个int成员变量来表示同步状态</strong>，通过内置的FIFO队列来完成获取资源线程的排队工作。AQS使用CAS对该同步状态进行原子操作实现对其值的修改。</p>
-<p>状态信息通过procted类型的getState，setState，compareAndSetState进行操作</p>
-<pre><code>```
-//返回同步状态的当前值
- protected final int getState() &#123;  
-     return state;
- &#125;
- // 设置同步状态的值
- protected final void setState(int newState) &#123; 
-     state = newState;
-&#125;
-//原子地（CAS操作）将同步状态值设置为给定值update如果当前同步状态的值等于expect（期望值）
-protected final boolean compareAndSetState(int expect, int update) &#123;
-   return unsafe.compareAndSwapInt(this, stateOffset, expect, update);
-&#125;
-```
+                <h3 id="MySQL-索引"><a href="#MySQL-索引" class="headerlink" title="MySQL 索引"></a>MySQL 索引</h3><p>数据库索引的原理：数据库索引，是数据库管理系统中一个排序的数据结构，以协助快速查询、更新数据库表中数据。索引的实现通常使用 BTree 及其变种 B+Tree。</p>
+<p>本文从如何建立 MySQL 索引以及介绍 MySQL 的索引类型，再讲 MySQL 索引的利与弊，以及建立索引时需要注意的地方。</p>
+<p>首先:先假设有一张表,表的数据有 10W 条数据,其中有一条数据是 nickname=’css’ ,如果要拿这条数据的话需要些的 sql 是</p>
+<pre><code> SELECT * FROM award WHERE nickname = &#39;css&#39;;
 </code></pre>
-<h3 id="2、AQS设计思想"><a href="#2、AQS设计思想" class="headerlink" title="2、AQS设计思想"></a>2、AQS设计思想</h3><ul>
-<li>使用Node实现FIFO队列，可以用于构建锁或者其他同步装置的基础框架。</li>
-<li>利用int类型标识状态。<strong>在AQS类中有一个叫做state的成员变量</strong></li>
+<p>一般情况下,在没有建立索引的时候, mysql 需要扫描全表及扫描 10W 条数据找这条数据,如果我在 nickname 上建立索引,那么mysql只需要扫描一行数据及为我们找到这条 nickname=’css’ 的数据,是不是感觉性能提升了好多咧….</p>
+<p>mysql 的索引分为 单例索引（主键索引、唯一索引、普通索引）和 组合索引。</p>
+<ul>
+<li><p>单例索引：一个索引只包含一个列，一个表可以有多个单例索引。</p>
+</li>
+<li><p>组合索引：一个组合索引包含两个或两个以上的列。<br>本文使用的案例的表：</p>
+<pre><code> CREATE TABLE `award` (
+   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT &#39;用户id&#39;,
+   `aty_id` varchar(100) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;活动场景id&#39;,
+   `nickname` varchar(12) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;用户昵称&#39;,
+   `is_awarded` tinyint(1) NOT NULL DEFAULT 0 COMMENT &#39;用户是否领奖&#39;,
+   `award_time` int(11) NOT NULL DEFAULT 0 COMMENT &#39;领奖时间&#39;,
+   `account` varchar(12) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;帐号&#39;,
+   `password` char(32) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;密码&#39;,
+   `message` varchar(255) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;获奖信息&#39;,
+   `created_time` int(11) NOT NULL DEFAULT 0 COMMENT &#39;创建时间&#39;,
+   `updated_time` int(11) NOT NULL DEFAULT 0 COMMENT &#39;更新时间&#39;,
+   PRIMARY KEY (`id`)
+ ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT=&#39;获奖信息表&#39;;
+ 
+INSERT INTO `award` (`nickname`, `account`, `message`, `created_time`)
+VALUES (&#39;rSUQFzpkDz3R&#39;, &#39;DYxJoqZq2rd7&#39;, &#39;aaabbbccccxuxuxuxuuxux&#39;, 1449567822);```
+</code></pre>
+</li>
 </ul>
-<p>基于AQS有一个同步组件，叫做ReentrantLock。<strong>在这个组件里，stste表示获取锁的线程数，假如state=0，表示还没有线程获取锁，1表示有线程获取了锁。大于1表示重入锁的数量。</strong></p>
-<p>继承：子类通过继承并通过实现它的方法管理其状态（acquire和release方法操纵状态）。</p>
-<p>可以同时实现排它锁和共享锁模式（独占、共享），站在一个使用者的角度，AQS的功能主要分为两类：<strong>独占和共享</strong>。它的所有子类中，要么实现并使用了它的独占功能的api，要么使用了共享锁的功能，而不会同时使用两套api，即便是最有名的子类ReentrantReadWriteLock也是通过两个内部类读锁和写锁分别实现了两套api来实现的。</p>
-<h3 id="3、AQS的大致实现思路"><a href="#3、AQS的大致实现思路" class="headerlink" title="3、AQS的大致实现思路"></a>3、AQS的大致实现思路</h3><p>AQS内部维护了一个CLH队列来管理锁。<strong>线程会首先尝试获取锁，如果失败就将当前线程及等待状态等信息包装成一个node节点加入到同步队列sync queue里</strong>。 接着会不断的循环尝试获取锁，条件是当前节点为head的直接后继才会尝试。如果失败就会阻塞自己直到自己被唤醒。而当持有锁的线程释放锁的时候，会唤醒队列中的后继线程。</p>
-<p>CLH(Craig,Landin,and Hagersten)队列是一个虚拟的双向队列（虚拟的双向队列即不存在队列实例，仅存在结点之间的关联关系）。AQS是将每条请求共享资源的线程封装成一个CLH锁队列的一个结点（Node）来实现锁的分配。</p>
+<h4 id="一-索引的创建"><a href="#一-索引的创建" class="headerlink" title="(一) 索引的创建"></a>(一) 索引的创建</h4><ol>
+<li>单例索引</li>
+</ol>
+<p>1.1）普通索引，这个是最基本的索引。</p>
+<p>其 sql 格式是 :</p>
+<pre><code> CREATE INDEX IndexName ON `TableName`(`字段名`(length));
+# 或者
+ALTER TABLE TableName ADD INDEX IndexName(`字段名`(length));
+</code></pre>
+<p>第一种方式：</p>
+<pre><code>CREATE INDEX account_Index ON `award`(`account`);
+</code></pre>
+<p>第二种方式：</p>
+<pre><code>ALTER TABLE award ADD INDEX account_Index(`account`);
+</code></pre>
+<p>如果是 CHAR , VARCHAR 类型, length 可以小于字段的实际长度,如果是BLOB和TEXT类型就必须指定长度。</p>
+<p>1.2）唯一索引，与普通索引类似，但是不同的是唯一索引要求所有的列的值是唯一的，这一点和主键索引一样，但是它允许有空值。</p>
+<p>其 sql 格式是：</p>
+<pre><code>CREATE UNIQUE INDEX IndexName ON `TableName`(`字段名`(length));
+# 或者
+ALTER TABLE TableName ADD UNIQUE (column_list); 
+</code></pre>
+<p>第一种方式</p>
+<pre><code>CREATE UNIQUE INDEX account_UNIQUE_Index ON `award`(`account`);
+</code></pre>
+<p>1.3）主键索引，不允许有空值,（在 B+Tree 中的 InnoDB 引擎中，主键索引起到了至关重要的位置）</p>
+<p>主键索引建立的规则是 int 优于 varchar，一般在建表的时候创建，最好是与表的其他字段不相关的列或者是业务不相关的列。一般会设为 int 而且是 AUTO_INCREMENT 自增类型的。</p>
+<ol start="2">
+<li>组合索引</li>
+</ol>
+<p>一个表中含有多个单例索引不代表是组合索引，通俗一点讲，组合索引是：包含多个字段但是只有索引名称。</p>
+<p>其 sql 格式是：</p>
+<pre><code>CREATE INDEX nickname_account_createdTime_Index ON `award`(`nickname`, `account`, `created_time`);
+</code></pre>
+<p><img src="https://upload-images.jianshu.io/upload_images/5114528-706c6315f0abee2e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1200/format/webp" alt="avatar"></p>
+<p>如果你建立了组合索引 (nickname_account_createdTime_Index)，那么它实际包含的是 3 个索引 (nickname) (nickname,account)(nickname,account,created_time)</p>
+<p>在使用查询的时候遵循 mysql 组合索引的 “最左前缀”，即索引 where 时的条件要按照建立索引的时候字段的排列方式。</p>
+<p>1、不按索引最左列开始查询（多列索引） 例如</p>
+<pre><code> index(‘c1’, ‘c2’, ‘c3’) where c2 = &#39;aaa&#39; # 不使用索引
+ where c2 = &#39;aaa&#39; and c3=&#39;sss&#39; # 不能使用索引
+</code></pre>
+<p>2、查询某个列有范围查询，则其右边的所有列都无法使用查询（多列查询）</p>
+<pre><code>Where c1= &#39;xxx&#39; and c2 like &#39;aa%&#39; and c3=&#39;sss&#39;
+# 该查询只会使用索引中的前两列,因为like是范围查询
+</code></pre>
+<p>3、不能跳过某个字段来进行查询，这样利用不到索引，比如：</p>
+<pre><code>EXPLAIN SELECT * FROM `award` WHERE nickname &gt; &#39;rSUQFzpkDz3R&#39; AND account = &#39;DYxJoqZq2rd7&#39; AND created_time = 1449567822; 
+</code></pre>
+<p>因为我的索引是 (nickname, account, created_time)，如果第一个字段出现 范围符号 的查找，那么将不会用到索引，如果我是第二个或者第三个字段使用范围符号的查找，那么它会利用索引，利用的索引是 (nickname)，因为上面说了建立组合索引 (nickname, account, created_time)，会出现三个索引。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/5114528-e89fefe045067907.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1200/format/webp" alt="avatar"></p>
+<p>注：使用组合检索的时候可能需要把前面创建的单例检索删除，否则可能会使用单例检索</p>
+<p>3.全文索引</p>
+<p>文本字段上（text）如果建立的是普通索引，那么只有对文本的字段内容前面的字符进行索引，其字符大小根据索引建立索引时声明的大小来规定。</p>
+<p>如果文本中出现多个一样的字符，而且需要查找的话，那么其条件只能是 where column like ‘%xxxx%’， 这样做会让索引失效</p>
+<p>这个时候全文索引就有作用了</p>
+<pre><code>ALTER TABLE TableName ADD FULLTEXT(column1, column2);
+
+ALTER TABLE `award` ADD FULLTEXT(`message`);
+</code></pre>
+<p>ALTER TABLE <code>award</code> ADD FULLTEXT(<code>message</code>);<br>有了全文索引，就可以用 SELECT 查询命令去检索那些包含着一个或多个给定单词的数据记录了。</p>
+<pre><code>SELECT * FROM TableName WHERE MATCH(column1, column2) AGAINST(&#39;xxx&#39;, &#39;sss&#39;, &#39;ddd&#39;);
+
+SELECT * FROM TableName WHERE MATCH(column1, column2) AGAINST(&#39;xxx&#39;, &#39;sss&#39;, &#39;ddd&#39;);
+</code></pre>
+<p><img src="https://upload-images.jianshu.io/upload_images/5114528-1940bc1006952c47.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1200/format/webp" alt="avatar"></p>
+<h3 id="使用索引的优点"><a href="#使用索引的优点" class="headerlink" title="使用索引的优点"></a>使用索引的优点</h3><p>1）可以通过建立唯一索引或者主键索引，保证数据库表中每一行数据的唯一性</p>
+<p>2）建立索引可以大大提高检索的数据，以及减少表的检索行数</p>
+<p>3）在表连接的连接条件，可以加速表与表直接的相连</p>
+<p>4）在分组和排序字句进行数据检索，可以减少查询时间中 分组 和 排序 所消耗的时间（数据库的记录会重新排序）</p>
+<p>5）建立索引，在查询中使用索引，可以提高性能</p>
+<h3 id="使用索引的缺点"><a href="#使用索引的缺点" class="headerlink" title="使用索引的缺点"></a>使用索引的缺点</h3><p>1）创建索引和维护索引会消耗时间，随着数据量的增加而增加</p>
+<p>2）索引文件会占用物理空间，除了数据表需要占用物理空间之外，每一个索引还会占用一定的物理空间</p>
+<p>3）当对表的数据进行 INSERT,UPDATE,DELETE 的时候,索引也要动态的维护,这样就会降低数据的维护速度,(建立索引会占用磁盘空间的索引文件。一般情况这个问题不太严重，但如果你在一个大表上创建了多种组合索引，索引文件的会膨胀很快)。</p>
+<h3 id="五-使用索引需要注意的地方"><a href="#五-使用索引需要注意的地方" class="headerlink" title="(五) 使用索引需要注意的地方"></a>(五) 使用索引需要注意的地方</h3><p>在建立索引的时候应该考虑索引该建立在数据库表中的某些列上，哪一些索引需要建立，哪一些索引是多余的，一般来说：</p>
+<p>1）在经常需要搜索的列上,可以加快索引的速度</p>
+<p>2）主键列上可以确保列的唯一性</p>
+<p>3）在表与表的连接条件上加上索引,可以加快连接查询的速度</p>
+<p>4）在经常需要排序 (order by) ,分组 (group by) 和的 distinct 列上加索引 可以加快排序查询的时间, (单独order by 用不了索引，索引考虑加where 或加limit)</p>
+<p>5）在一些 where 之后的 &lt; &lt;= &gt; &gt;= BETWEEN IN 以及某个情况下的like 建立字段的索引(B-TREE)</p>
+<p>6）like语句，前导模糊查询 like “%XXX” 不能使用索引，而非前导模糊查询 like “XXX%” 则可以</p>
+<p>7）索引不会包含 NULL 列,如果列中包含 NULL 值都将不会被包含在索引中,复合索引中如果有一列含有NULL值那么这个组合索引都将失效,一般需要给默认值0或者 ‘ ‘ 字符串</p>
+<p>8）使用短索引,如果你的一个字段是 Char(32) 或者 int(32) ,在创建索引的时候指定前缀长度 比如前10个字符 (前提是多数值是唯一的..)那么短索引可以提高查询速度,并且可以减少磁盘的空间,也可以减少I/0操作.</p>
+<p>9）不要在列上进行运算,这样会使得mysql索引失效,也会进行全表扫描</p>
+<p>10）选择越小的数据类型越好,因为通常越小的数据类型通常在磁盘,内存,cpu,缓存中 占用的空间很少,处理起来更快</p>
+<h3 id="六-什么情况下不创建索引"><a href="#六-什么情况下不创建索引" class="headerlink" title="(六) 什么情况下不创建索引"></a>(六) 什么情况下不创建索引</h3><p>1）查询中很少使用到的列不应该创建索引,如果建立了索引然而还会降低mysql的性能和增大了空间需求.</p>
+<p>2）很少数据的列也不应该建立索引,比如 一个性别字段 0或者1,在查询中,结果集的数据占了表中数据行的比例比较大,mysql需要扫描的行数很多,增加索引,并不能提高效率</p>
+<p>3）定义为 text 和 image 和 bit 数据类型的列不应该增加索引</p>
+<p>4）当表的修改(UPDATE,INSERT,DELETE)操作远远大于检索(SELECT)操作时不应该创建索引,这两个操作是互斥的关系</p>
+<h3 id="七-MySQL-优化之道"><a href="#七-MySQL-优化之道" class="headerlink" title="(七) MySQL 优化之道"></a>(七) MySQL 优化之道</h3><p>一些常见的 SQL 实践</p>
+<ul>
+<li><p>负向条件不能使用索引</p>
+<p>  select from order where status!=0 and status!=1</p>
+<p>  not in/not exists # 都不是好习惯</p>
+</li>
+</ul>
+<p>可以优化为 in 查询：<br>    select from order where status in(2,3)</p>
+<ul>
+<li><p>前导模糊查询不能使用索引</p>
+<p>  select from order where desc like ‘%XX’</p>
+</li>
+</ul>
+<p>而非前导模糊查询则可以：</p>
+<pre><code>select from order where desc like &#39;XX%&#39;
+</code></pre>
+<ul>
+<li><p>数据区分度不大的字段不宜使用索引</p>
+<p>  select from user where sex=1</p>
+</li>
+</ul>
+<p>原因：性别只有男，女，每次过滤掉的数据很少，不宜使用索引。</p>
+<p>经验上，能过滤80%数据时就可以使用索引。对于订单状态，如果状态值很少，不宜使用索引，如果状态值很多，能够过滤大量数据，则应该建立索引。</p>
+<ul>
+<li><p>在属性上进行计算不能命中索引</p>
+<p>  select from order_ where YEAR(date) &lt;= ‘2017’</p>
+</li>
+</ul>
+<p>即使 date 上建立了索引，也会全表扫描，可优化为值计算：</p>
+<pre><code>select from order_ where date &lt;= CURDATE()
+</code></pre>
+<p>或者：</p>
+<pre><code>select from order_ where date &lt; = &#39;2017-01-01&#39;
+</code></pre>
+<p>并非周知的 SQL 实践</p>
+<ul>
+<li><p>如果业务大部分是单条查询，使用 Hash 索引性能更好，例如用户中心</p>
+<p>  select from <code>user</code> where uid = ?<br>  select from user where login_name=?</p>
+</li>
+</ul>
+<p>原因：B-Tree索引的时间复杂度是 O(log(n))；Hash 索引的时间复杂度是 O(1)</p>
+<ul>
+<li>允许 null的列，查询有潜在大坑</li>
+</ul>
+<p>单列索引不存 null 值，复合索引不存全为 null 的值，如果列允许为 null，可能会得到“不符合预期”的结果集</p>
+<pre><code>select from user where name != &#39;shenjian&#39;
+</code></pre>
+<p>如果 name 允许为 null，索引不存储null值，结果集中不会包含这些记录。所以，请使用 not null 约束以及默认值。</p>
+<ul>
+<li>复合索引最左前缀，并不是指 SQL 语句的 where顺序要和符合索引一致。</li>
+</ul>
+<p>用户中心建立了 (login_name, password) 的符合索引</p>
+<pre><code>select from user where login_name=? and passwd=?
+select from user where passwd=? and login_name=?
+</code></pre>
+<p>都能够命中索引</p>
+<pre><code>select from user where login_name=?
+</code></pre>
+<p>也能命中索引，满足符合索引最左前缀</p>
+<pre><code>select from user where passwd=?
+</code></pre>
+<p>不能命中索引，不满足符合索引最左前缀。</p>
+<ul>
+<li>使用 ENUM 而不是字符串</li>
+</ul>
+<p>ENUM 保存的是 TINYINT，别在枚举中搞一些“中国”“北京”“技术部”这样的字符串，字符串空间又大，效率又低。</p>
+<p><strong>小众但有用的 SQL 实践</strong></p>
+<ul>
+<li><p>如果明确知道只有一条结果返回，limit 1 能够提高效率</p>
+<p>  select from user where login_name=?</p>
+</li>
+</ul>
+<p>可以优化为：</p>
+<p>select from user where login_name=? limit 1</p>
+<p>原因：你知道只有一条结果，但数据库并不知道，明确告诉它，让它主动停止游标移动</p>
+<ul>
+<li>把计算放到业务层而不是数据库层，除了节省数据的 CPU，还有意想不到的查询缓存优化效果</li>
+</ul>
+<pre><code>select from order where date &lt; = CURDATE()
+</code></pre>
+<p>这不是一个号的 SQL 实践，应该优化为：</p>
+<pre><code>$curDate = date(&#39;Y-m-d&#39;);
+$res = mysqlquery(&#39;select from order where date &lt; = $curDate&#39;);
+</code></pre>
+<p>原因：释放了数据库的 CPU，多次调用，传入的SQL相同，才可以利用查询缓存</p>
+<ul>
+<li>强制类型转换会全表扫描  select from user where phone=13800001234</li>
+</ul>
 
                 
             </div>
@@ -489,7 +643,7 @@ protected final boolean compareAndSetState(int expect, int update) &#123;
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://wangtianyu-ui.github.io/2020/09/12/AQS%E5%8F%8A%E5%85%B6%E5%8E%9F%E7%90%86/">https://wangtianyu-ui.github.io/2020/09/12/AQS%E5%8F%8A%E5%85%B6%E5%8E%9F%E7%90%86/</a>
+                    <a href="https://wangtianyu-ui.github.io/2021/04/10/Mysql%E7%B4%A2%E5%BC%95/">https://wangtianyu-ui.github.io/2021/04/10/Mysql%E7%B4%A2%E5%BC%95/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -527,8 +681,8 @@ protected final boolean compareAndSetState(int expect, int update) &#123;
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/%E5%B9%B6%E5%8F%91/">
-                                    <span class="chip bg-color">并发</span>
+                                <a href="/tags/Mysql/">
+                                    <span class="chip bg-color">Mysql</span>
                                 </a>
                             
                         </div>
@@ -704,31 +858,31 @@ protected final boolean compareAndSetState(int expect, int update) &#123;
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2020/10/01/Voliate%E5%85%B3%E9%94%AE%E5%AD%97/">
+                <a href="/2021/05/12/JVM%E5%86%85%E5%AD%98%E5%88%92%E5%88%86/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/16.jpg" class="responsive-img" alt="Voliate关键字">
+                        <img src="/medias/featureimages/16.jpg" class="responsive-img" alt="JVM内存划分">
                         
-                        <span class="card-title">Voliate关键字</span>
+                        <span class="card-title">JVM内存划分</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            
+                            对于Java程序员，在虚拟机自动内存管理机制的帮助下，不再需要为每个new操作去写配对的delete/free代码，不容易出现内存泄漏和内存溢出问题
                         
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2020-10-01
+                            <i class="far fa-clock fa-fw icon-date"></i>2021-05-12
                         </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/%E5%B9%B6%E5%8F%91/" class="post-category">
-                                    并发
+                            <a href="/categories/JVM/" class="post-category">
+                                    JVM
                                 </a>
                             
                             
@@ -738,8 +892,8 @@ protected final boolean compareAndSetState(int expect, int update) &#123;
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/%E5%B9%B6%E5%8F%91/">
-                        <span class="chip bg-color">并发</span>
+                    <a href="/tags/JVM/">
+                        <span class="chip bg-color">JVM</span>
                     </a>
                     
                 </div>
@@ -753,13 +907,13 @@ protected final boolean compareAndSetState(int expect, int update) &#123;
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2020/09/01/Java%E4%B8%ADCAS%E8%AF%A6%E8%A7%A3/">
+                <a href="/2021/01/01/Spring%20AOP%E7%90%86%E8%A7%A3/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/15.jpg" class="responsive-img" alt="Java中CAS详解">
+                        <img src="/medias/featureimages/4.jpg" class="responsive-img" alt="Spring AOP理解">
                         
-                        <span class="card-title">Java中CAS详解</span>
+                        <span class="card-title">Spring AOP理解</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -770,14 +924,14 @@ protected final boolean compareAndSetState(int expect, int update) &#123;
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2020-09-01
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-01-01
                             </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/%E5%B9%B6%E5%8F%91/" class="post-category">
-                                    并发
+                            <a href="/categories/Spring/" class="post-category">
+                                    Spring
                                 </a>
                             
                             
@@ -787,8 +941,8 @@ protected final boolean compareAndSetState(int expect, int update) &#123;
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/%E5%B9%B6%E5%8F%91/">
-                        <span class="chip bg-color">并发</span>
+                    <a href="/tags/Spring/">
+                        <span class="chip bg-color">Spring</span>
                     </a>
                     
                 </div>

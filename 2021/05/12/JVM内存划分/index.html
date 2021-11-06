@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="MySQL索引, 王添俞的博客">
+    <meta name="keywords" content="JVM内存划分, 王添俞的博客">
     <meta name="description" content="">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -16,7 +16,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>MySQL索引 | 王添俞的博客</title>
+    <title>JVM内存划分 | 王添俞的博客</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -95,17 +95,6 @@
     
   </li>
   
-  <li class="hide-on-med-and-down nav-item">
-    
-    <a href="/contact" class="waves-effect waves-light">
-      
-      <i class="fas fa-comments" style="zoom: 0.6;"></i>
-      
-      <span>留言板</span>
-    </a>
-    
-  </li>
-  
   <li>
     <a href="#searchModal" class="modal-trigger waves-effect waves-light">
       <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
@@ -172,17 +161,6 @@
 			    <i class="fa-fw fas fa-archive"></i>
 			
 			归档
-		</a>
-          
-        </li>
-        
-        <li class="m-nav-item">
-	  
-		<a href="/contact" class="waves-effect waves-light">
-			
-			    <i class="fa-fw fas fa-comments"></i>
-			
-			留言板
 		</a>
           
         </li>
@@ -266,12 +244,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/3.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/16.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">MySQL索引</h1>
+                    <h1 class="description center-align post-title">JVM内存划分</h1>
                 </div>
             </div>
         </div>
@@ -387,8 +365,8 @@
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/Mysql/">
-                                <span class="chip bg-color">Mysql</span>
+                            <a href="/tags/JVM/">
+                                <span class="chip bg-color">JVM</span>
                             </a>
                         
                     </div>
@@ -399,8 +377,8 @@
                     <div class="post-cate">
                         <i class="fas fa-bookmark fa-fw icon-category"></i>
                         
-                            <a href="/categories/Mysql/" class="post-category">
-                                Mysql
+                            <a href="/categories/JVM/" class="post-category">
+                                JVM
                             </a>
                         
                     </div>
@@ -412,7 +390,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2020-12-10
+                    2021-05-12
                 </div>
                 
 
@@ -433,212 +411,161 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h3 id="MySQL-索引"><a href="#MySQL-索引" class="headerlink" title="MySQL 索引"></a>MySQL 索引</h3><p>数据库索引的原理：数据库索引，是数据库管理系统中一个排序的数据结构，以协助快速查询、更新数据库表中数据。索引的实现通常使用 BTree 及其变种 B+Tree。</p>
-<p>本文从如何建立 MySQL 索引以及介绍 MySQL 的索引类型，再讲 MySQL 索引的利与弊，以及建立索引时需要注意的地方。</p>
-<p>首先:先假设有一张表,表的数据有 10W 条数据,其中有一条数据是 nickname=’css’ ,如果要拿这条数据的话需要些的 sql 是</p>
-<pre><code> SELECT * FROM award WHERE nickname = &#39;css&#39;;
-</code></pre>
-<p>一般情况下,在没有建立索引的时候, mysql 需要扫描全表及扫描 10W 条数据找这条数据,如果我在 nickname 上建立索引,那么mysql只需要扫描一行数据及为我们找到这条 nickname=’css’ 的数据,是不是感觉性能提升了好多咧….</p>
-<p>mysql 的索引分为 单例索引（主键索引、唯一索引、普通索引）和 组合索引。</p>
-<ul>
-<li><p>单例索引：一个索引只包含一个列，一个表可以有多个单例索引。</p>
-</li>
-<li><p>组合索引：一个组合索引包含两个或两个以上的列。<br>本文使用的案例的表：</p>
-<pre><code> CREATE TABLE `award` (
-   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT &#39;用户id&#39;,
-   `aty_id` varchar(100) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;活动场景id&#39;,
-   `nickname` varchar(12) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;用户昵称&#39;,
-   `is_awarded` tinyint(1) NOT NULL DEFAULT 0 COMMENT &#39;用户是否领奖&#39;,
-   `award_time` int(11) NOT NULL DEFAULT 0 COMMENT &#39;领奖时间&#39;,
-   `account` varchar(12) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;帐号&#39;,
-   `password` char(32) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;密码&#39;,
-   `message` varchar(255) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;获奖信息&#39;,
-   `created_time` int(11) NOT NULL DEFAULT 0 COMMENT &#39;创建时间&#39;,
-   `updated_time` int(11) NOT NULL DEFAULT 0 COMMENT &#39;更新时间&#39;,
-   PRIMARY KEY (`id`)
- ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT=&#39;获奖信息表&#39;;
- 
-INSERT INTO `award` (`nickname`, `account`, `message`, `created_time`)
-VALUES (&#39;rSUQFzpkDz3R&#39;, &#39;DYxJoqZq2rd7&#39;, &#39;aaabbbccccxuxuxuxuuxux&#39;, 1449567822);```
-</code></pre>
-</li>
-</ul>
-<h4 id="一-索引的创建"><a href="#一-索引的创建" class="headerlink" title="(一) 索引的创建"></a>(一) 索引的创建</h4><ol>
-<li>单例索引</li>
+                <p>###1. 概述<br>对于Java程序员，在虚拟机自动内存管理机制的帮助下，不再需要为每个new操作去写配对的delete/free代码，不容易出现内存泄漏和内存溢出问题。</p>
+<h3 id="2-运行时数据区域"><a href="#2-运行时数据区域" class="headerlink" title="2. 运行时数据区域"></a>2. 运行时数据区域</h3><p>Java虚拟机在执行Java程序的过程中会把它管理的内存划分为若干个不同的数据区域。这些区域都有各自的用途，以及创建和销毁的时间，有的区域随着虚拟机进程的启动而存在，有些区域则依赖用户线程的启动和结束而建立和销毁。根据《Java虚拟机规范（Java SE 7版）》的规定，Java虚拟机所管理的内存将会包括以下几个运行时数据区域：程序计数器，Java虚拟机栈，本地方法栈，Java堆，方法区。</p>
+<p>下图为各个区域以及进一步细化图：</p>
+<p><img src="https://images2018.cnblogs.com/blog/563799/201804/563799-20180424161205943-784876438.png" alt="avatar"></p>
+<h4 id="程序计数器"><a href="#程序计数器" class="headerlink" title="程序计数器"></a>程序计数器</h4><p><strong>程序计数器（Program Counter Register）是一块较小的内存空间，可以看做当前线程所执行的字节码的行号指示器。字节码解释器工作时就是通过改变这个计数器的值来选取下一条需要执行的字节码指令，分支、循环、跳转、异常处理、线程恢复等基础功能都需要依赖这个计数器来完成。</strong></p>
+<p>由于Java虚拟机的多线程是通过线程轮流切换并分配处理器执行时间的方式来实现的，在任何一个确定的时刻，一个处理器都只会执行一条线程中的指令。因此，为了线程切换后能恢复到正确的执行位置，每条线程都需要有一个独立的程序计数器，每个线程之间计数器互不影响，独立存储。</p>
+<p>备注：</p>
+<p>（a）如果线程正在执行的是一个Java方法，这个计数器记录的是正在执行的虚拟机字节码指令的地址；如果正在执行的是Native方法，这个计数器的值则为空。</p>
+<p>（b）此内存区域是唯一在Java虚拟机规范中没有规定任何OOM情况的区域。</p>
+<h4 id="2-2-Java虚拟机栈"><a href="#2-2-Java虚拟机栈" class="headerlink" title="2.2 Java虚拟机栈"></a>2.2 Java虚拟机栈</h4><p>Java Virtual Machine Stacks，也是线程私有的，它的生命周期与线程相同。</p>
+<p>虚拟机栈描述的是<strong>Java方法执行的内存模型（非native方法）</strong>。</p>
+<p>每个方法在执行的同时都会创建一个栈帧用于存储局部变量表，操作数栈，动态链接，方法出口等信息。</p>
+<p>每一个方法从调用直至执行完成的过程，就对应着一个栈帧在虚拟机栈中入栈到出栈的过程，当方法被调用则入栈，一旦完成调用则出栈。所有的栈帧都出栈后，线程就结束了。</p>
+<p>局部变量表存放了编译器可知的各种<strong>基本数据类型、对象引用、returnAddress类型</strong>。局部变量表所需的内存空间在编译器完成分配。当进入一个方法时，这个方法需要在帧中分配多大的局部变量空间是完全确定的，在方法运行期间不会改变局部变量表的大小。</p>
+<p><strong>基本类型</strong>：boolean, byte, char, short, int, float, long, double，其中long和double占用2个局部变量空间slot其余的占用1个；</p>
+<p><strong>对象引用</strong>：reference类型，它不等同于对象本身，可能是一个指向对象起始地址的引用指针，也可能是指向一个代表对象的句柄或其他与此对象相关的位置；</p>
+<p><strong>returnAddress类型</strong>：指向了一条字节码指令的地址；</p>
+<p>在Java虚拟机规范中，对这个区域规定了两种异常：线程请求的栈深度大于虚拟机所允许的深度，抛出StackOverflowError异常；如果虚拟机栈可以动态扩展（目前大部分的Java虚拟机都可动态扩展，只不过Java虚拟机规范中也允许固定长度的虚拟机栈），如果扩展时无法申请到足够的内存，抛出OutOfMemoryError异常。</p>
+<h4 id="2-3-本地方法栈"><a href="#2-3-本地方法栈" class="headerlink" title="2.3 本地方法栈"></a>2.3 本地方法栈</h4><p>Native Method Stack与虚拟机栈的作用非常相似，区别是：虚拟机栈为虚拟机执行Java方法（也就是字节码）服务，而本地方法栈则为虚拟机使用到的Native方法。</p>
+<p>备注：HotSpot直接把本地方法栈和虚拟机栈合二为一。本地方法栈区域也会抛出StackOverflowError和OutOfMemoryError异常。</p>
+<h4 id="2-4-Java堆"><a href="#2-4-Java堆" class="headerlink" title="2.4 Java堆"></a>2.4 Java堆</h4><p>Java Heap是Java虚拟机所管理的内存中最大的一块。Java堆是被所有线程共享的一块内存区域，在虚拟机启动时创建。此区域的唯一目的就是存放对象实例（Java虚拟机规范中的描述时：所有的对象实例以及数组都要在堆上分配）。</p>
+<p>Java堆是GC的主要区域，因此很多时候也被称为GC堆。</p>
+<p><strong>从内存分配的角度来看</strong>，线程共享的Java堆中可能划分出多个线程私有的分配缓冲区（Thread Local Allocation Buffer, TLAB）</p>
+<p><strong>从内存回收的角度来看</strong>，由于现在收集器基本都采用分代收集算法，所以Java堆中还可以细分为：新生代和老年代，在细致一点的有Eden空间，From Survivor空间，To Survivor空间等。</p>
+<p>备注：有OOM异常</p>
+<h4 id="2-5-方法区"><a href="#2-5-方法区" class="headerlink" title="2.5 方法区"></a>2.5 方法区</h4><p><strong>Method Area是各个线程共享内存区域，用于存储已被虚拟机加载的类信息，常量，静态变量，即时编译器编译后的代码等数据。这个区域的内存回收目标主要是针对常量池的回收和对类型的卸载。</strong></p>
+<p>在HtoSpot虚拟机中该区域叫永久代，即方法区是虚拟机规范，而永久代是HotSpot实现的方法区。</p>
+<p>绝大部分Java 程序员应该都见过 “java.lang.OutOfMemoryError: PermGen space “这个异常。这里的 “PermGen space”其实指的就是方法区（永久代）。不过方法区和“PermGen space”又有着本质的区别。前者是 JVM 的规范，而后者则是JVM 规范的一种实现，并且只有 HotSpot 才有 “PermGen space”，而对于其他类型的虚拟机，如JRockit（Oracle）、J9（IBM）并没有“PermGen space”。</p>
+<p>注：从JDK7开始永久代的移除工作，存储在永久代的一部分数据已经转移到了Java Heap或者是Native Heap。但永久代仍然存在于JDK7，并没有完全的移除：符号引用(Symbols)转移到了native heap;字面量(interned strings)转移到了java heap;类的静态变量(class statics)转移到了java heap。</p>
+<p>备注：有OOM异常</p>
+<h3 id="2-6-补充"><a href="#2-6-补充" class="headerlink" title="2.6 补充"></a>2.6 补充</h3><h4 id="2-6-1-运行时常量池和Class文件常量池"><a href="#2-6-1-运行时常量池和Class文件常量池" class="headerlink" title="2.6.1 运行时常量池和Class文件常量池"></a>2.6.1 运行时常量池和Class文件常量池</h4><p>Runtime Constant Pool是方法区的一部分。Class文件中除了有类的版本，字段，方法，接口等描述信息，还有一项信息是常量池，用于存放编译期生成的各种字面量和符号引用，这部分内容将在类加载后进入方法区的运行时常量池中存放。</p>
+<p>运行时常量池相对于Class文件常量池的另外一个重要特征是具备动态性。</p>
+<p>备注：有OOM异常</p>
+<h4 id="2-6-2-直接内存"><a href="#2-6-2-直接内存" class="headerlink" title="2.6.2 直接内存"></a>2.6.2 直接内存</h4><p>Direct Memory，并不是虚拟机运行时数据区的一部分，也不是Java虚拟机规范中定义的内存区域。</p>
+<p>在jdk1.4加入的NIO类，引入了一种基于通道（Chanel）与缓冲区（Buffer）的IO方式，<strong>它可以使用Native函数库直接分配堆外内存，然后通过一个存储在Java堆中的DirectByteBuffer对象作为这块内存的引用进行操作。</strong>这样能在一些场景中显著提高性能，因为避免了在Java堆和Native堆中来回复制数据。</p>
+<p>备注：本机直接内存的分配不会受到Java堆大小的限制，受到本机总内存和处理器寻址空间的限制，有OOM异常。</p>
+<h3 id="3-HotSpot虚拟机"><a href="#3-HotSpot虚拟机" class="headerlink" title="3. HotSpot虚拟机"></a>3. HotSpot虚拟机</h3><h4 id="3-1-内存划分"><a href="#3-1-内存划分" class="headerlink" title="3.1 内存划分"></a>3.1 内存划分</h4><p>根据JVM规范，内存可分为：<strong>虚拟机栈，本地方法栈，堆，方法区，程序计数器</strong>五个部分。</p>
+<p>但是各种虚拟机HotSpot，JRockit实现却与JVM不尽相同。</p>
+<p>HotSpot主要有：<strong>虚拟机栈，堆，程序计数器，Metaspace，直接内存</strong>四个部分。</p>
+<p>如下为JDK8的内存划分：</p>
+<p><img src="https://images2018.cnblogs.com/blog/563799/201804/563799-20180424161205943-784876438.png" alt="avatar"></p>
+<p>其中，元空间（Metaspace）的本质和永久代类似，都是对JVM规范中方法区的实现。</p>
+<p>不过元空间与永久代之间最大的区别在于：元空间并不在虚拟机中，而是使用本地内存。</p>
+<p>因此，默认情况下，元空间的大小仅受本地内存限制，但可以通过以下参数来指定元空间的大小：</p>
+<p>-XX:MetaspaceSize，初始空间大小，达到该值就会触发垃圾收集进行类型卸载，同时GC会对该值进行调整：如果释放了大量的空间，就适当降低该值；如果释放了很少的空间，那么在不超过MaxMetaspaceSize时，适当提高该值。<br>-XX:MaxMetaspaceSize，最大空间，默认是没有限制的。</p>
+<h3 id="3-2-对象的创建、内存布局、访问定位"><a href="#3-2-对象的创建、内存布局、访问定位" class="headerlink" title="3.2 对象的创建、内存布局、访问定位"></a>3.2 对象的创建、内存布局、访问定位</h3><p>基于虚拟机HotSpot深入探讨Java堆中对象分配、布局和访问的全过程。</p>
+<h4 id="3-2-1-对象的创建"><a href="#3-2-1-对象的创建" class="headerlink" title="3.2.1 对象的创建"></a>3.2.1 对象的创建</h4><p>（1）虚拟机遇到new指令后，首先检查new指令的参数是否能在常量池中定位到一个类的符号引用，并且检查这个符号引用代表的类是否被加载，解析和初始化过。如果没有，那必须先执行类的加载过程；</p>
+<p>（2）类加载检查通过之后，虚拟机将为新生对象分配内存（<strong>对象所需内存的大小在类加载完成后可完全确定</strong>）；</p>
+<p>（3）内存分配完成后，虚拟机需要将分配到的内存空间都初始化为零值（不包括对象头），这一步操作保证了对象的实例字段在Java代码中可以不赋初始值就直接使用，程序能访问到这些字段的数据类型所对应的零值；</p>
+<p>（4）对对象进行必要的设置，例如这个对象是哪个类的实例，如果才能找到类的元数据信息，对象的哈希码，对象的GC分代年龄等信息（这些对象存放在对象的对象头Object Header中）</p>
+<p>（5）执行init方法，把对象按照程序员的意愿进行初始化。</p>
+<p>有<strong>指针碰撞和空闲列表</strong>两种分配方式：选择哪种分配方式由Java堆是否规整决定，而Java堆是否规整又由所采用的GC是否带有压缩整理功能决定；因此，在使用Serial、ParNew等带Compact过程的收集器时，系统采用的分配算法时指针碰撞，而使用CMS这种基于Mark-Sweep算法的收集器时，通常采用空闲列表。</p>
+<p>此外还有对象创建的并发问题：</p>
+<p>（1）堆分配内存空间的动作进行同步处理–采用CAS配上失败重试的方式保证更新操作的原子性；</p>
+<p>（2）把内存分配的动作按照线程划分在不同的空间之中进行，即每个线程在Java堆中预先分配一小块内存，称为本地线程分配缓存（Thread Local Allocation Buffer,TLAB）</p>
+<p><strong>注：指针碰撞：内存是规整的，空闲列表：内存不是规整的</strong></p>
+<h4 id="3-2-2-对象的内存布局"><a href="#3-2-2-对象的内存布局" class="headerlink" title="3.2.2 对象的内存布局"></a>3.2.2 对象的内存布局</h4><p>在HotSpot虚拟机中，对象在内存中存储的布局可以分为3块区域：对象头、实例数据、对齐填充。</p>
+<p>如图：<br><img src="https://images2018.cnblogs.com/blog/563799/201804/563799-20180424165642779-735642794.png" alt="avatar"></p>
+<ol>
+<li>对象头（存储在堆）包括两部分：<br>（1）存储对象自身的运行时数据，如哈希码，GC分代年龄，锁状态标识，线程持有的锁，偏向线程ID，偏向时间戳等，官方称为Mark Word。Mark Word被设计成一个非固定的数据结构以便在极小的空间内存储尽量多的信息，它会根据对象的状态复用自己的存储空间。</li>
 </ol>
-<p>1.1）普通索引，这个是最基本的索引。</p>
-<p>其 sql 格式是 :</p>
-<pre><code> CREATE INDEX IndexName ON `TableName`(`字段名`(length));
-# 或者
-ALTER TABLE TableName ADD INDEX IndexName(`字段名`(length));
-</code></pre>
-<p>第一种方式：</p>
-<pre><code>CREATE INDEX account_Index ON `award`(`account`);
-</code></pre>
-<p>第二种方式：</p>
-<pre><code>ALTER TABLE award ADD INDEX account_Index(`account`);
-</code></pre>
-<p>如果是 CHAR , VARCHAR 类型, length 可以小于字段的实际长度,如果是BLOB和TEXT类型就必须指定长度。</p>
-<p>1.2）唯一索引，与普通索引类似，但是不同的是唯一索引要求所有的列的值是唯一的，这一点和主键索引一样，但是它允许有空值。</p>
-<p>其 sql 格式是：</p>
-<pre><code>CREATE UNIQUE INDEX IndexName ON `TableName`(`字段名`(length));
-# 或者
-ALTER TABLE TableName ADD UNIQUE (column_list); 
-</code></pre>
-<p>第一种方式</p>
-<pre><code>CREATE UNIQUE INDEX account_UNIQUE_Index ON `award`(`account`);
-</code></pre>
-<p>1.3）主键索引，不允许有空值,（在 B+Tree 中的 InnoDB 引擎中，主键索引起到了至关重要的位置）</p>
-<p>主键索引建立的规则是 int 优于 varchar，一般在建表的时候创建，最好是与表的其他字段不相关的列或者是业务不相关的列。一般会设为 int 而且是 AUTO_INCREMENT 自增类型的。</p>
+<p>（2）类型指针，即对象指向它的类元数据的指针，虚拟机通过这个指针来确定这个对象是哪个类的实例。</p>
 <ol start="2">
-<li>组合索引</li>
+<li><p>实例数据部分是对象真正存储的有效信息，也是在程序代码中所定义的各种类型的字段内容。</p>
+</li>
+<li><p>对齐填充并不是必然存在的，也没有特别的含义。HotSpot自动内存管理系统要求对象起始地址必须是8字节的倍数，也就是说对象的大小必须是8字节的整数倍。而对象头部分正好是8字节的倍数，因此，当对象实例数据不符没有对齐时，就需要通过对齐填充来补全。</p>
+</li>
 </ol>
-<p>一个表中含有多个单例索引不代表是组合索引，通俗一点讲，组合索引是：包含多个字段但是只有索引名称。</p>
-<p>其 sql 格式是：</p>
-<pre><code>CREATE INDEX nickname_account_createdTime_Index ON `award`(`nickname`, `account`, `created_time`);
-</code></pre>
-<p><img src="https://upload-images.jianshu.io/upload_images/5114528-706c6315f0abee2e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1200/format/webp" alt="avatar"></p>
-<p>如果你建立了组合索引 (nickname_account_createdTime_Index)，那么它实际包含的是 3 个索引 (nickname) (nickname,account)(nickname,account,created_time)</p>
-<p>在使用查询的时候遵循 mysql 组合索引的 “最左前缀”，即索引 where 时的条件要按照建立索引的时候字段的排列方式。</p>
-<p>1、不按索引最左列开始查询（多列索引） 例如</p>
-<pre><code> index(‘c1’, ‘c2’, ‘c3’) where c2 = &#39;aaa&#39; # 不使用索引
- where c2 = &#39;aaa&#39; and c3=&#39;sss&#39; # 不能使用索引
-</code></pre>
-<p>2、查询某个列有范围查询，则其右边的所有列都无法使用查询（多列查询）</p>
-<pre><code>Where c1= &#39;xxx&#39; and c2 like &#39;aa%&#39; and c3=&#39;sss&#39;
-# 该查询只会使用索引中的前两列,因为like是范围查询
-</code></pre>
-<p>3、不能跳过某个字段来进行查询，这样利用不到索引，比如：</p>
-<pre><code>EXPLAIN SELECT * FROM `award` WHERE nickname &gt; &#39;rSUQFzpkDz3R&#39; AND account = &#39;DYxJoqZq2rd7&#39; AND created_time = 1449567822; 
-</code></pre>
-<p>因为我的索引是 (nickname, account, created_time)，如果第一个字段出现 范围符号 的查找，那么将不会用到索引，如果我是第二个或者第三个字段使用范围符号的查找，那么它会利用索引，利用的索引是 (nickname)，因为上面说了建立组合索引 (nickname, account, created_time)，会出现三个索引。</p>
-<p><img src="https://upload-images.jianshu.io/upload_images/5114528-e89fefe045067907.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1200/format/webp" alt="avatar"></p>
-<p>注：使用组合检索的时候可能需要把前面创建的单例检索删除，否则可能会使用单例检索</p>
-<p>3.全文索引</p>
-<p>文本字段上（text）如果建立的是普通索引，那么只有对文本的字段内容前面的字符进行索引，其字符大小根据索引建立索引时声明的大小来规定。</p>
-<p>如果文本中出现多个一样的字符，而且需要查找的话，那么其条件只能是 where column like ‘%xxxx%’， 这样做会让索引失效</p>
-<p>这个时候全文索引就有作用了</p>
-<pre><code>ALTER TABLE TableName ADD FULLTEXT(column1, column2);
+<h4 id="3-2-3-对象的访问定位"><a href="#3-2-3-对象的访问定位" class="headerlink" title="3.2.3 对象的访问定位"></a>3.2.3 对象的访问定位</h4><p>Java程序需要通过栈上的reference数据来操作堆上的具体对象。由于reference类型在Java虚拟机规范中规定了一个指向对象的引用，并没有定义这个引用应该通过何种方式去定位，访问堆中的对象的具体位置，所以对象访问方式也是取决于虚拟机实现而言的。目前主流的访问方式有使用<strong>句柄</strong>和<strong>直接指针</strong>两种。</p>
+<p>（1）句柄访问</p>
+<p>Java堆中将会划分出一块内存来作为句柄池，reference中存储的就是对象的句柄地址，而句柄中包含了对象实例数据和类型数据各自的具体地址信息。</p>
+<p>（2）直接指针，reference中存储的是对象地址，而对象实例的对象头中有类型指针，指向类型数据。</p>
+<p><img src="https://images2017.cnblogs.com/blog/563799/201710/563799-20171019171310146-817535230.png" alt="avatar"></p>
+<p>两种对象访问各有优势，使用句柄来访问的最大好处是reference中存储的是稳定的句柄地址，对象被移动（垃圾收集时移动对象是非常普遍的行为）时只会改变句柄中的实例数据指针，而reference本身不需要修改。</p>
+<p>直接指针最大好处就是速度更快，节省了一次指针定位的时间开销。<br><strong>HotSpot使用了直接指针方式进行对象访问。</strong></p>
+<p>备注：reference应该指向堆中Java对象的内存地址，而对象的内存布局里面包括：对象头和对象数据，对象头里面有对象类型指针。</p>
+<h3 id="4-OOM"><a href="#4-OOM" class="headerlink" title="4. OOM"></a>4. OOM</h3><p>OOM：OutOfMemoryError异常</p>
+<p>在Java虚拟机规范中，除了程序计数器外，虚拟机内存的其他几个运行时区域都有发生OOM异常的可能。</p>
+<p>下面的代码都是基于JDK1.8，因此对<strong>堆，虚拟机栈，Metaspace和直接内存</strong>做验证和分析。</p>
+<h4 id="4-1-堆OOM"><a href="#4-1-堆OOM" class="headerlink" title="4.1 堆OOM"></a>4.1 堆OOM</h4><p>代码:</p>
+<pre><code>import java.util.ArrayList;
 
-ALTER TABLE `award` ADD FULLTEXT(`message`);
-</code></pre>
-<p>ALTER TABLE <code>award</code> ADD FULLTEXT(<code>message</code>);<br>有了全文索引，就可以用 SELECT 查询命令去检索那些包含着一个或多个给定单词的数据记录了。</p>
-<pre><code>SELECT * FROM TableName WHERE MATCH(column1, column2) AGAINST(&#39;xxx&#39;, &#39;sss&#39;, &#39;ddd&#39;);
+ import java.util.List;
 
-SELECT * FROM TableName WHERE MATCH(column1, column2) AGAINST(&#39;xxx&#39;, &#39;sss&#39;, &#39;ddd&#39;);
+ /**
+
+   * VM -Xms20m -Xmx20m -XX:+HeapDumpOnOutOfMemoryError
+ 
+  *
+
+   */
+
+ public class HeapOOM &#123;
+     public static void main(String[] args) &#123;
+
+    List&lt;HeapOOM&gt; list = new ArrayList&lt;HeapOOM&gt;();
+
+    while(true)
+
+        list.add(new HeapOOM());
+
+&#125;
+&#125; 
 </code></pre>
-<p><img src="https://upload-images.jianshu.io/upload_images/5114528-1940bc1006952c47.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1200/format/webp" alt="avatar"></p>
-<h3 id="使用索引的优点"><a href="#使用索引的优点" class="headerlink" title="使用索引的优点"></a>使用索引的优点</h3><p>1）可以通过建立唯一索引或者主键索引，保证数据库表中每一行数据的唯一性</p>
-<p>2）建立索引可以大大提高检索的数据，以及减少表的检索行数</p>
-<p>3）在表连接的连接条件，可以加速表与表直接的相连</p>
-<p>4）在分组和排序字句进行数据检索，可以减少查询时间中 分组 和 排序 所消耗的时间（数据库的记录会重新排序）</p>
-<p>5）建立索引，在查询中使用索引，可以提高性能</p>
-<h3 id="使用索引的缺点"><a href="#使用索引的缺点" class="headerlink" title="使用索引的缺点"></a>使用索引的缺点</h3><p>1）创建索引和维护索引会消耗时间，随着数据量的增加而增加</p>
-<p>2）索引文件会占用物理空间，除了数据表需要占用物理空间之外，每一个索引还会占用一定的物理空间</p>
-<p>3）当对表的数据进行 INSERT,UPDATE,DELETE 的时候,索引也要动态的维护,这样就会降低数据的维护速度,(建立索引会占用磁盘空间的索引文件。一般情况这个问题不太严重，但如果你在一个大表上创建了多种组合索引，索引文件的会膨胀很快)。</p>
-<h3 id="五-使用索引需要注意的地方"><a href="#五-使用索引需要注意的地方" class="headerlink" title="(五) 使用索引需要注意的地方"></a>(五) 使用索引需要注意的地方</h3><p>在建立索引的时候应该考虑索引该建立在数据库表中的某些列上，哪一些索引需要建立，哪一些索引是多余的，一般来说：</p>
-<p>1）在经常需要搜索的列上,可以加快索引的速度</p>
-<p>2）主键列上可以确保列的唯一性</p>
-<p>3）在表与表的连接条件上加上索引,可以加快连接查询的速度</p>
-<p>4）在经常需要排序 (order by) ,分组 (group by) 和的 distinct 列上加索引 可以加快排序查询的时间, (单独order by 用不了索引，索引考虑加where 或加limit)</p>
-<p>5）在一些 where 之后的 &lt; &lt;= &gt; &gt;= BETWEEN IN 以及某个情况下的like 建立字段的索引(B-TREE)</p>
-<p>6）like语句，前导模糊查询 like “%XXX” 不能使用索引，而非前导模糊查询 like “XXX%” 则可以</p>
-<p>7）索引不会包含 NULL 列,如果列中包含 NULL 值都将不会被包含在索引中,复合索引中如果有一列含有NULL值那么这个组合索引都将失效,一般需要给默认值0或者 ‘ ‘ 字符串</p>
-<p>8）使用短索引,如果你的一个字段是 Char(32) 或者 int(32) ,在创建索引的时候指定前缀长度 比如前10个字符 (前提是多数值是唯一的..)那么短索引可以提高查询速度,并且可以减少磁盘的空间,也可以减少I/0操作.</p>
-<p>9）不要在列上进行运算,这样会使得mysql索引失效,也会进行全表扫描</p>
-<p>10）选择越小的数据类型越好,因为通常越小的数据类型通常在磁盘,内存,cpu,缓存中 占用的空间很少,处理起来更快</p>
-<h3 id="六-什么情况下不创建索引"><a href="#六-什么情况下不创建索引" class="headerlink" title="(六) 什么情况下不创建索引"></a>(六) 什么情况下不创建索引</h3><p>1）查询中很少使用到的列不应该创建索引,如果建立了索引然而还会降低mysql的性能和增大了空间需求.</p>
-<p>2）很少数据的列也不应该建立索引,比如 一个性别字段 0或者1,在查询中,结果集的数据占了表中数据行的比例比较大,mysql需要扫描的行数很多,增加索引,并不能提高效率</p>
-<p>3）定义为 text 和 image 和 bit 数据类型的列不应该增加索引</p>
-<p>4）当表的修改(UPDATE,INSERT,DELETE)操作远远大于检索(SELECT)操作时不应该创建索引,这两个操作是互斥的关系</p>
-<h3 id="七-MySQL-优化之道"><a href="#七-MySQL-优化之道" class="headerlink" title="(七) MySQL 优化之道"></a>(七) MySQL 优化之道</h3><p>一些常见的 SQL 实践</p>
-<ul>
-<li><p>负向条件不能使用索引</p>
-<p>  select from order where status!=0 and status!=1</p>
-<p>  not in/not exists # 都不是好习惯</p>
-</li>
-</ul>
-<p>可以优化为 in 查询：<br>    select from order where status in(2,3)</p>
-<ul>
-<li><p>前导模糊查询不能使用索引</p>
-<p>  select from order where desc like ‘%XX’</p>
-</li>
-</ul>
-<p>而非前导模糊查询则可以：</p>
-<pre><code>select from order where desc like &#39;XX%&#39;
+<p>-Xms20m -Xmx20m -XX:+HeapDumpOnOutOfMemoryError</p>
+<p>Java堆的大小为20MB，不可扩展；通过参数-XX:+HeapDumpOnOutOfMemoryError可以让虚拟机在出现内存溢出异常时Dump出当前的内存堆转储快照。</p>
+<p>运行结果：</p>
+<p><img src="https://images2018.cnblogs.com/blog/563799/201804/563799-20180424172145047-1935669708.png" alt="avatar"></p>
+<h4 id="4-2-虚拟机栈OOM"><a href="#4-2-虚拟机栈OOM" class="headerlink" title="4.2 虚拟机栈OOM"></a>4.2 虚拟机栈OOM</h4><p>HotSpot虚拟机中并不区分虚拟机栈和本地方法栈，统一是虚拟机栈。</p>
+<p>栈容量只由-Xss参数设定。</p>
+<p>在Java虚拟机规范中描述了2种异常：</p>
+<p>（1）如果线程请求的栈深度大于虚拟机所允许的最大深度，将抛出StackOverflowError异常；</p>
+<p>（2）如果虚拟机在扩展栈时无法申请到足够的内存空间，则抛出OOM。</p>
+<p>代码:</p>
+<pre><code>/**
+
+   * VM -Xss108k
+
+   *
+
+ */
+
+  public class JavaVMStackSOF &#123;
+      private int stackLength = 1;
+      public void stackLeak() &#123;
+      stackLength++;
+      stackLeak();
+&#125;
+
+ 
+
+public static void main(String[] args) &#123;
+
+    JavaVMStackSOF oom = new JavaVMStackSOF();
+
+    try &#123;
+
+        oom.stackLeak();
+
+    &#125; catch (Throwable t) &#123;
+
+        System.out.println(oom.stackLength);
+
+        throw t;
+
+    &#125;
+
+ &#125;
+&#125;　
 </code></pre>
-<ul>
-<li><p>数据区分度不大的字段不宜使用索引</p>
-<p>  select from user where sex=1</p>
-</li>
-</ul>
-<p>原因：性别只有男，女，每次过滤掉的数据很少，不宜使用索引。</p>
-<p>经验上，能过滤80%数据时就可以使用索引。对于订单状态，如果状态值很少，不宜使用索引，如果状态值很多，能够过滤大量数据，则应该建立索引。</p>
-<ul>
-<li><p>在属性上进行计算不能命中索引</p>
-<p>  select from order_ where YEAR(date) &lt;= ‘2017’</p>
-</li>
-</ul>
-<p>即使 date 上建立了索引，也会全表扫描，可优化为值计算：</p>
-<pre><code>select from order_ where date &lt;= CURDATE()
-</code></pre>
-<p>或者：</p>
-<pre><code>select from order_ where date &lt; = &#39;2017-01-01&#39;
-</code></pre>
-<p>并非周知的 SQL 实践</p>
-<ul>
-<li><p>如果业务大部分是单条查询，使用 Hash 索引性能更好，例如用户中心</p>
-<p>  select from <code>user</code> where uid = ?<br>  select from user where login_name=?</p>
-</li>
-</ul>
-<p>原因：B-Tree索引的时间复杂度是 O(log(n))；Hash 索引的时间复杂度是 O(1)</p>
-<ul>
-<li>允许 null的列，查询有潜在大坑</li>
-</ul>
-<p>单列索引不存 null 值，复合索引不存全为 null 的值，如果列允许为 null，可能会得到“不符合预期”的结果集</p>
-<pre><code>select from user where name != &#39;shenjian&#39;
-</code></pre>
-<p>如果 name 允许为 null，索引不存储null值，结果集中不会包含这些记录。所以，请使用 not null 约束以及默认值。</p>
-<ul>
-<li>复合索引最左前缀，并不是指 SQL 语句的 where顺序要和符合索引一致。</li>
-</ul>
-<p>用户中心建立了 (login_name, password) 的符合索引</p>
-<pre><code>select from user where login_name=? and passwd=?
-select from user where passwd=? and login_name=?
-</code></pre>
-<p>都能够命中索引</p>
-<pre><code>select from user where login_name=?
-</code></pre>
-<p>也能命中索引，满足符合索引最左前缀</p>
-<pre><code>select from user where passwd=?
-</code></pre>
-<p>不能命中索引，不满足符合索引最左前缀。</p>
-<ul>
-<li>使用 ENUM 而不是字符串</li>
-</ul>
-<p>ENUM 保存的是 TINYINT，别在枚举中搞一些“中国”“北京”“技术部”这样的字符串，字符串空间又大，效率又低。</p>
-<p><strong>小众但有用的 SQL 实践</strong></p>
-<ul>
-<li><p>如果明确知道只有一条结果返回，limit 1 能够提高效率</p>
-<p>  select from user where login_name=?</p>
-</li>
-</ul>
-<p>可以优化为：</p>
-<p>select from user where login_name=? limit 1</p>
-<p>原因：你知道只有一条结果，但数据库并不知道，明确告诉它，让它主动停止游标移动</p>
-<ul>
-<li>把计算放到业务层而不是数据库层，除了节省数据的 CPU，还有意想不到的查询缓存优化效果</li>
-</ul>
-<pre><code>select from order where date &lt; = CURDATE()
-</code></pre>
-<p>这不是一个号的 SQL 实践，应该优化为：</p>
-<pre><code>$curDate = date(&#39;Y-m-d&#39;);
-$res = mysqlquery(&#39;select from order where date &lt; = $curDate&#39;);
-</code></pre>
-<p>原因：释放了数据库的 CPU，多次调用，传入的SQL相同，才可以利用查询缓存</p>
-<ul>
-<li>强制类型转换会全表扫描  select from user where phone=13800001234</li>
-</ul>
+<p>-Xss指定栈内存容量。</p>
+<p>运行结果：</p>
+<p><img src="https://images2018.cnblogs.com/blog/563799/201804/563799-20180424190147259-1583450039.png" alt="avatar"></p>
+<h3 id="4-3-元空间OOM"><a href="#4-3-元空间OOM" class="headerlink" title="4.3 元空间OOM"></a>4.3 元空间OOM</h3><h3 id="4-4-直接内存OOM"><a href="#4-4-直接内存OOM" class="headerlink" title="4.4 直接内存OOM"></a>4.4 直接内存OOM</h3><h3 id="5-参考资料"><a href="#5-参考资料" class="headerlink" title="5 参考资料"></a>5 参考资料</h3><p>深入理解Java虚拟机：JVM高级特性与最佳实践（第二版）</p>
+<p>　</p>
 
                 
             </div>
@@ -665,7 +592,7 @@ $res = mysqlquery(&#39;select from order where date &lt; = $curDate&#39;);
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://wangtianyu-ui.github.io/2020/12/10/Mysql%E7%B4%A2%E5%BC%95/">https://wangtianyu-ui.github.io/2020/12/10/Mysql%E7%B4%A2%E5%BC%95/</a>
+                    <a href="https://wangtianyu-ui.github.io/2021/05/12/JVM%E5%86%85%E5%AD%98%E5%88%92%E5%88%86/">https://wangtianyu-ui.github.io/2021/05/12/JVM%E5%86%85%E5%AD%98%E5%88%92%E5%88%86/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -703,8 +630,8 @@ $res = mysqlquery(&#39;select from order where date &lt; = $curDate&#39;);
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/Mysql/">
-                                    <span class="chip bg-color">Mysql</span>
+                                <a href="/tags/JVM/">
+                                    <span class="chip bg-color">JVM</span>
                                 </a>
                             
                         </div>
@@ -880,13 +807,13 @@ $res = mysqlquery(&#39;select from order where date &lt; = $curDate&#39;);
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2020/12/20/Spring%20IOC%E7%90%86%E8%A7%A3/">
+                <a href="/2021/09/15/Java%E4%B8%ADCAS%E8%AF%A6%E8%A7%A3/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/23.jpg" class="responsive-img" alt="Spring IOC理解">
+                        <img src="/medias/featureimages/15.jpg" class="responsive-img" alt="Java中CAS详解">
                         
-                        <span class="card-title">Spring IOC理解</span>
+                        <span class="card-title">Java中CAS详解</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -897,14 +824,14 @@ $res = mysqlquery(&#39;select from order where date &lt; = $curDate&#39;);
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2020-12-20
+                            <i class="far fa-clock fa-fw icon-date"></i>2021-09-15
                         </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Spring/" class="post-category">
-                                    Spring
+                            <a href="/categories/%E5%B9%B6%E5%8F%91/" class="post-category">
+                                    并发
                                 </a>
                             
                             
@@ -914,8 +841,8 @@ $res = mysqlquery(&#39;select from order where date &lt; = $curDate&#39;);
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Spring/">
-                        <span class="chip bg-color">Spring</span>
+                    <a href="/tags/%E5%B9%B6%E5%8F%91/">
+                        <span class="chip bg-color">并发</span>
                     </a>
                     
                 </div>
@@ -929,13 +856,13 @@ $res = mysqlquery(&#39;select from order where date &lt; = $curDate&#39;);
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2020/11/12/Dubbo%E5%85%A5%E9%97%A8/">
+                <a href="/2021/04/10/Mysql%E7%B4%A2%E5%BC%95/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/7.jpg" class="responsive-img" alt="Dubbo入门">
+                        <img src="/medias/featureimages/3.jpg" class="responsive-img" alt="MySQL索引">
                         
-                        <span class="card-title">Dubbo入门</span>
+                        <span class="card-title">MySQL索引</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
@@ -946,14 +873,14 @@ $res = mysqlquery(&#39;select from order where date &lt; = $curDate&#39;);
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2020-11-12
+                                <i class="far fa-clock fa-fw icon-date"></i>2021-04-10
                             </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-bookmark fa-fw icon-category"></i>
                             
-                            <a href="/categories/Dubbo/" class="post-category">
-                                    Dubbo
+                            <a href="/categories/Mysql/" class="post-category">
+                                    Mysql
                                 </a>
                             
                             
@@ -963,8 +890,8 @@ $res = mysqlquery(&#39;select from order where date &lt; = $curDate&#39;);
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/Dubbo/">
-                        <span class="chip bg-color">Dubbo</span>
+                    <a href="/tags/Mysql/">
+                        <span class="chip bg-color">Mysql</span>
                     </a>
                     
                 </div>
